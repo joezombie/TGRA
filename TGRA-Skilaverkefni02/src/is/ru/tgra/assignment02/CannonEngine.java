@@ -28,6 +28,10 @@ public class CannonEngine implements ApplicationListener{
     @Override
     public void create() {
         this.lines = new ArrayList<Line>();
+        //lines.add(new Line(100, 200, 400, 200));
+        lines.add(new Line(0, 0, 800, 600));
+        lines.add(new Line(0, 600, 800, 0));
+        lines.add(new Line(100, 300, 700, 300));
 
         Vector<Point2D> vertexList = new Vector<Point2D>();
 
@@ -71,11 +75,17 @@ public class CannonEngine implements ApplicationListener{
         if(cannonBall.visible){
 
 
+            for (Line line: lines){
+                collide(cannonBall, line, deltaTime);
+            }
+
             cannonBall.update(deltaTime);
+
+
 
             if((cannonBall.x > width || cannonBall.x < 0 || cannonBall.y > height || cannonBall.y < 0)){
                 cannonBall.visible = false;
-                lines.clear();
+                //lines.clear();
             }
 
         }else {
@@ -120,6 +130,39 @@ public class CannonEngine implements ApplicationListener{
         }
     }
 
+    private void collide(CannonBallNew cannonBall, Line line, float deltaTime){
+        Point2D n = new Point2D(0,0);
+        n.x = -(line.yy-line.y);
+        n.y = line.xx - line.x;
+
+        float tHit = n.x * (line.x - cannonBall.x) + n.y * (line.y - cannonBall.y)
+                     / (n.x * cannonBall.motionX + n.y * cannonBall.motionY);
+
+        if(tHit <= deltaTime && tHit > 0){
+            Point2D pHit = new Point2D(0,0);
+            pHit.x = cannonBall.x + cannonBall.motionX * tHit;
+            pHit.y = cannonBall.y + cannonBall.motionY * tHit;
+
+            if((pHit.x >= line.x && pHit.x <= line.xx) || (pHit.x >= line.xx && pHit.x <= line.x)){
+                Point2D reflectedMotion = new Point2D(0,0);
+                System.out.println("Collison");
+
+                float lengthOfN = (float) Math.sqrt(n.x * n.x + n.y * n.y);
+                n.x = n.x / lengthOfN;
+                n.y = n.y / lengthOfN;
+
+                float aDotN = cannonBall.motionX * n.x + cannonBall.motionY * n.y;
+
+                reflectedMotion.x = cannonBall.motionX - 2 * aDotN * n.x;
+                reflectedMotion.y = cannonBall.motionY - 2 * aDotN * n.y;
+
+                cannonBall.motionX = reflectedMotion.x;
+                cannonBall.motionY = reflectedMotion.y;
+            }
+
+        }
+
+    }
 
 
     @Override
