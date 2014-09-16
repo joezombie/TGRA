@@ -21,7 +21,7 @@ public class CannonEngine implements ApplicationListener{
     int height = 600;
 
     Cannon cannon;
-    CannonBall cannonBall;
+    CannonBallNew cannonBall;
     List<Line> lines;
     FloatBuffer vertexBuffer;
 
@@ -32,7 +32,7 @@ public class CannonEngine implements ApplicationListener{
         Vector<Point2D> vertexList = new Vector<Point2D>();
 
         this.cannon = new Cannon(35, 150, vertexList, width/2, 0);
-        this.cannonBall = new CannonBall(15, 64, vertexList, 200, 200);
+        this.cannonBall = new CannonBallNew(15, 64, vertexList, 200, 200);
 
         int floatBufferSize = vertexList.size() * 2;
         vertexBuffer = BufferUtils.newFloatBuffer(floatBufferSize);
@@ -70,9 +70,9 @@ public class CannonEngine implements ApplicationListener{
 
         if(cannonBall.visible){
 
-            float cannonBallAngle = (MathUtils.PI / 180) * (cannon.angle + 90);
-            cannonBall.x += (300.0f * MathUtils.cos(cannonBallAngle) * deltaTime);
-            cannonBall.y += (300.0f * MathUtils.sin(cannonBallAngle) * deltaTime);
+
+            cannonBall.update(deltaTime);
+
             if((cannonBall.x > width || cannonBall.x < 0 || cannonBall.y > height || cannonBall.y < 0)){
                 cannonBall.visible = false;
                 lines.clear();
@@ -93,6 +93,10 @@ public class CannonEngine implements ApplicationListener{
                 cannonBall.x = width / 2;
                 cannonBall.y = 0;
                 cannonBall.visible = true;
+                float cannonBallAngle = (MathUtils.PI / 180) * (cannon.angle + 90);
+                this.cannonBall.motionX = 300.0f * MathUtils.cos(cannonBallAngle);
+                this.cannonBall.motionY = 300.0f * MathUtils.sin(cannonBallAngle);
+
             }
 
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
