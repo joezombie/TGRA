@@ -28,7 +28,6 @@ public class CannonEngine implements ApplicationListener{
     @Override
     public void create() {
         this.lines = new ArrayList<Line>();
-        lines.add(new Line(100, 100, 200, 200));
 
         Vector<Point2D> vertexList = new Vector<Point2D>();
 
@@ -72,12 +71,11 @@ public class CannonEngine implements ApplicationListener{
         if(cannonBall.visible){
 
             float cannonBallAngle = (MathUtils.PI / 180) * (cannon.angle + 90);
-            cannonBall.x += (600.0f * MathUtils.cos(cannonBallAngle) * deltaTime);
-            cannonBall.y += (600.0f * MathUtils.sin(cannonBallAngle) * deltaTime);
-            System.out.println("X:" + Float.toString(cannonBall.x));
-            System.out.println("Y:" + Float.toString(cannonBall.y));
+            cannonBall.x += (300.0f * MathUtils.cos(cannonBallAngle) * deltaTime);
+            cannonBall.y += (300.0f * MathUtils.sin(cannonBallAngle) * deltaTime);
             if((cannonBall.x > width || cannonBall.x < 0 || cannonBall.y > height || cannonBall.y < 0)){
                 cannonBall.visible = false;
+                lines.clear();
             }
 
         }else {
