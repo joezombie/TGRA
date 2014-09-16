@@ -69,22 +69,37 @@ public class CannonEngine implements ApplicationListener{
     private void update() {
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
-            cannon.angle += 10 * deltaTime;
-            if (cannon.angle > 60){
-                cannon.angle = 60;
-            }
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
-            cannon.angle -= 10 * deltaTime;
-            if (cannon.angle < -60){
-                cannon.angle = -60;
-            }
-        } else if (Gdx.input.isKeyPressed(Input.Keys.Z)){
-            cannonBall.visible = true;
-        }
+        if(cannonBall.visible){
 
-        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-            lines.add(new Line(Gdx.input.getX(), Gdx.input.getY(), 0, 0));
+            float cannonBallAngle = (MathUtils.PI / 180) * (cannon.angle + 90);
+            cannonBall.x += (600.0f * MathUtils.cos(cannonBallAngle) * deltaTime);
+            cannonBall.y += (600.0f * MathUtils.sin(cannonBallAngle) * deltaTime);
+            System.out.println("X:" + Float.toString(cannonBall.x));
+            System.out.println("Y:" + Float.toString(cannonBall.y));
+            if((cannonBall.x > width || cannonBall.x < 0 || cannonBall.y > height || cannonBall.y < 0)){
+                cannonBall.visible = false;
+            }
+
+        }else {
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                cannon.angle += 50 * deltaTime;
+                if (cannon.angle > 60) {
+                    cannon.angle = 60;
+                }
+            } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                cannon.angle -= 50 * deltaTime;
+                if (cannon.angle < -60) {
+                    cannon.angle = -60;
+                }
+            } else if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
+                cannonBall.x = width / 2;
+                cannonBall.y = 0;
+                cannonBall.visible = true;
+            }
+
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                lines.add(new Line(Gdx.input.getX(), Gdx.input.getY(), 0, 0));
+            }
         }
     }
 
@@ -92,11 +107,11 @@ public class CannonEngine implements ApplicationListener{
         Gdx.gl11.glClear(org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT);
         Gdx.gl11.glMatrixMode(org.lwjgl.opengl.GL11.GL_MODELVIEW);
         Gdx.gl11.glLoadIdentity();
-        Gdx.glu.gluOrtho2D(Gdx.gl10, 0, width, 0, height);
-        Gdx.gl11.glColor4f(1f, 1f, 1f, 1f);
+        Gdx.glu.gluOrtho2D(Gdx.gl11, 0, width, 0, height);
 
-        cannon.draw(vertexBuffer);
         cannonBall.draw(vertexBuffer);
+        cannon.draw(vertexBuffer);
+
 
         for(Line line: lines){
             line.draw();
