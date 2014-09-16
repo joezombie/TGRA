@@ -8,7 +8,10 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL11;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -21,44 +24,45 @@ public class CannonEngine implements ApplicationListener{
     int width = 800;
     int height = 600;
 
+    private SpriteBatch fontBatch;
+    private BitmapFont font;
     int outOfBounds = 0;
+    int maxOutOfBounds = 6;
     int inToGoal = 0;
-
-    boolean drawingLine = false;
-    Point2D linePointA;
+    String goals = "Goals: 0";
+    String misses = "Misses: 0 / " + Integer.toString(maxOutOfBounds);
 
     Cannon cannon;
     CannonBallNew cannonBall;
     Goal goal;
 
     List<Line> lines;
+    List<Line> borderLines;
     FloatBuffer vertexBuffer;
     List<Box> boxes;
     FloatBuffer vertexBufferBox;
     Vector<Point2D> vertexListBox;
+    Vector<Point2D> vertexList;
 
     @Override
     public void create() {
         this.lines = new ArrayList<Line>();
-        lines.add(new Line(new Point2D(0, 40), new Point2D(width/2 - 80, 40)));
-        lines.add(new Line(new Point2D(width/2 + 80, 40), new Point2D(width, 40)));
-        //lines.add(new Line(new Point2D(50, height - 50), new Point2D(width - 50, height - 50)));
+        this.borderLines = new ArrayList<Line>();
+        borderLines.add(new Line(new Point2D(0, 40), new Point2D(width/2 - 80, 40)));
+        borderLines.add(new Line(new Point2D(width/2 + 80, 40), new Point2D(width, 40)));
+
+        reset();
 
         this.boxes = new ArrayList<Box>();
         this.vertexListBox = new Vector<Point2D>();
         this.vertexBufferBox = getVertexBuffer(vertexListBox);
 
-        Vector<Point2D> vertexList = new Vector<Point2D>();
-        this.cannon = new Cannon(35, 150, new Point2D(width/2, 0) ,vertexList);
-        this.cannonBall = new CannonBallNew(15, 64, new Point2D(200, 200) , vertexList);
-        this.goal = new Goal(80, 256, new Point2D(100, 150), vertexList);
+        this.fontBatch = new SpriteBatch();
+        this.font = new BitmapFont();
+        font.setColor(Color.WHITE);
 
-        this.vertexBuffer = getVertexBuffer(vertexList);
-
-        // Enable vertex array.
         Gdx.gl11.glEnableClientState(org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY);
 
-        // Select clear color for the screen.
         Gdx.gl11.glClearColor(.3f, .3f, .3f, 1f);
 
         Gdx.input.setInputProcessor(new InputProcessor() {
@@ -118,11 +122,12 @@ public class CannonEngine implements ApplicationListener{
 
     private void update() {
         float deltaTime = Gdx.graphics.getDeltaTime();
-
-
-
         if(cannonBall.visible){
             for (Line line: lines){
+                collide(cannonBall, line, deltaTime);
+            }
+
+            for (Line line: borderLines){
                 collide(cannonBall, line, deltaTime);
             }
 
@@ -134,30 +139,37 @@ public class CannonEngine implements ApplicationListener{
 
             cannonBall.update(deltaTime);
 
-
-
             float distanceToGoal = (float) Math.sqrt(Math.pow(cannonBall.point.x - goal.point.x, 2) + Math.pow(cannonBall.point.y - goal.point.y, 2));
 
             if(distanceToGoal <= goal.radius - cannonBall.radius ){
                 cannonBall.visible = false;
                 this.inToGoal += 1;
+                this.goals = "Goals: " + Integer.toString(inToGoal);
+                this.goal = new Goal(goal.radius - 5, 256, goal.point, vertexList);
+                this.vertexBuffer = getVertexBuffer(vertexList);
+                clearObjects();
             }
 
             if((cannonBall.point.x > width || cannonBall.point.x < 0 || cannonBall.point.y > height || cannonBall.point.y < 0)){
                 cannonBall.visible = false;
                 this.outOfBounds += 1;
+                if(outOfBounds >= maxOutOfBounds){
+                    reset();
+                }
+                this.misses = "Misses: " + Integer.toString(outOfBounds) + " / " + Integer.toString(maxOutOfBounds);
+                clearObjects();
             }
 
         }else {
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 cannon.angle += 50 * deltaTime;
-                if (cannon.angle > 60) {
-                    cannon.angle = 60;
+                if (cannon.angle > 40) {
+                    cannon.angle = 40;
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 cannon.angle -= 50 * deltaTime;
-                if (cannon.angle < -60) {
-                    cannon.angle = -60;
+                if (cannon.angle < -40) {
+                    cannon.angle = -40;
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
                 cannonBall.point = new Point2D(cannon.point);
@@ -170,15 +182,27 @@ public class CannonEngine implements ApplicationListener{
         }
     }
 
+    private void reset(){
+        this.vertexList = new Vector<Point2D>();
+        this.cannon = new Cannon(35, 128, new Point2D(width/2, 0) ,vertexList);
+        this.cannonBall = new CannonBallNew(15, 64, new Point2D(200, 200) , vertexList);
+        this.goal = new Goal(80, 256, new Point2D(100, 150), vertexList);
+        this.vertexBuffer = getVertexBuffer(vertexList);
+        this.inToGoal = 0;
+        this.outOfBounds = 0;
+        this.goals = "Goals: " + Integer.toString(inToGoal);
+    }
+
     private void draw() {
         Gdx.gl11.glClear(org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT);
         Gdx.gl11.glMatrixMode(org.lwjgl.opengl.GL11.GL_MODELVIEW);
         Gdx.gl11.glLoadIdentity();
         Gdx.glu.gluOrtho2D(Gdx.gl11, 0, width, 0, height);
 
-        goal.draw(vertexBuffer);
-        cannonBall.draw(vertexBuffer);
-        cannon.draw(vertexBuffer);
+        fontBatch.begin();
+        font.draw(fontBatch, goals, 20, height - 20);
+        font.draw(fontBatch, misses, 20, height - 40);
+        fontBatch.end();
 
 
         for(Line line : lines){
@@ -188,21 +212,27 @@ public class CannonEngine implements ApplicationListener{
         for(Box box : boxes){
             box.draw(vertexBufferBox);
         }
+
+        goal.draw(vertexBuffer);
+        cannonBall.draw(vertexBuffer);
+        cannon.draw(vertexBuffer);
+
+        for(Line line : borderLines){
+            line.draw();
+        }
+    }
+
+    private void clearObjects(){
+        this.lines.clear();
+        this.boxes.clear();
+        this.vertexListBox.clear();
+        this.vertexBufferBox.clear();
     }
 
     private void onMouseDown(int x, int y, int button){
         if(button == Input.Buttons.LEFT){
             if(!cannonBall.visible) {
-                lines.add(new Line(new Point2D(x-40, height - y), new Point2D(x+40, height - y)));
-                /*
-                if (drawingLine) {
-                    lines.add(new Line(new Point2D(linePointA), new Point2D(x, height - y)));
-                    this.drawingLine = false;
-                } else {
-                    this.linePointA = new Point2D(x, height - y);
-                    this.drawingLine = true;
-                }
-                */
+                lines.add(new Line(new Point2D(x-60, height - y), new Point2D(x+60, height - y)));
             }
         } else if(button == Input.Buttons.RIGHT){
             boxes.add(new Box(100, 100, new Point2D(x, height - y), vertexListBox));
@@ -241,14 +271,6 @@ public class CannonEngine implements ApplicationListener{
         }
     }
 
-    private void collide(CannonBallNew cannonBall, Box box){
-        if(cannonBall.point.x < box.point.x + box.width/2 && cannonBall.point.x > box.point.x - box.width/2){
-            if(cannonBall.point.y < box.point.y + box.height/2 && cannonBall.point.y > box.point.y - box.width/2){
-                cannonBall.motion.x = -cannonBall.motion.x;
-                cannonBall.motion.y = -cannonBall.motion.y;
-            }
-        }
-    }
 
     private void collide(CannonBallNew cannonBall, Line2D line, float deltaTime){
         Vector2D n = new Vector2D();

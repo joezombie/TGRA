@@ -54,7 +54,7 @@ public class Box{
     }
 
     public void draw(FloatBuffer floatBuffer){
-        Gdx.gl11.glColor4f(0.5f, 0.1f, 0.8f, 1f);
+        Gdx.gl11.glColor4f(0f, 0.8f, 0f, 1f);
         Gdx.gl11.glVertexPointer(2, GL11.GL_FLOAT, 0, floatBuffer);
         Gdx.gl11.glPushMatrix();
         Gdx.gl11.glTranslatef(point.x, point.y, 0);

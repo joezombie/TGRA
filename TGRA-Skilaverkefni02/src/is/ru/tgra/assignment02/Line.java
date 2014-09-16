@@ -46,7 +46,7 @@ public class Line {
 
     public void draw(){
 
-        Gdx.gl11.glColor4f(.2f, .2f, 1f, 1f);
+        Gdx.gl11.glColor4f(0f, 0f, 0.9f, 1f);
         Gdx.gl11.glVertexPointer(2, GL11.GL_FLOAT, 0, vertexBuffer);
         Gdx.gl11.glPushMatrix();
         Gdx.gl11.glTranslatef(0, 0, 0);
