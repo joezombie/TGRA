@@ -14,29 +14,26 @@ public class Line {
     public int firstIndex;
     public int vertexCount;
     public int openGLPrimitiveType;
-    public float x;
-    public float y;
+    public Point2D pointA;
+    public Point2D pointB;
     public float red = 1f;
     public float green = 1f;
     public float blue = 1f;
     public float alpha = 1f;
-    public float xx;
-    public float yy;
+
 
     private FloatBuffer vertexBuffer;
 
-    public Line(float x, float y, float xx, float yy){
+    public Line(Point2D pointA, Point2D pointB){
         Vector<Point2D> vertexList = new Vector<Point2D>();
         this.firstIndex = vertexList.size();
         this.vertexCount = 2;
         this.openGLPrimitiveType = GL11.GL_LINES;
-        this.x = x;
-        this.y = y;
-        this.xx = xx;
-        this.yy = yy;
+        this.pointA = pointA;
+        this.pointB = pointB;
 
-        vertexList.add(new Point2D(x, y));
-        vertexList.add(new Point2D(xx, yy));
+        vertexList.add(new Point2D(pointA.x, pointA.y));
+        vertexList.add(new Point2D(pointB.x, pointB.y));
 
         int floatBufferSize = vertexList.size() * 2;
         vertexBuffer = BufferUtils.newFloatBuffer(floatBufferSize);

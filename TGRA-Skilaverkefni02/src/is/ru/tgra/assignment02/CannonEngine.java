@@ -29,14 +29,12 @@ public class CannonEngine implements ApplicationListener{
     public void create() {
         this.lines = new ArrayList<Line>();
         //lines.add(new Line(100, 200, 400, 200));
-        lines.add(new Line(0, 0, 800, 600));
-        lines.add(new Line(0, 600, 800, 0));
-        lines.add(new Line(100, 300, 700, 300));
+        lines.add(new Line(new Point2D(100, 300), new Point2D(700, 300)));
 
         Vector<Point2D> vertexList = new Vector<Point2D>();
 
-        this.cannon = new Cannon(35, 150, vertexList, width/2, 0);
-        this.cannonBall = new CannonBallNew(15, 64, vertexList, 200, 200);
+        this.cannon = new Cannon(35, 150, new Point2D(width/2, 0) ,vertexList);
+        this.cannonBall = new CannonBallNew(15, 64, new Point2D(200, 200) , vertexList);
 
         int floatBufferSize = vertexList.size() * 2;
         vertexBuffer = BufferUtils.newFloatBuffer(floatBufferSize);
@@ -83,7 +81,7 @@ public class CannonEngine implements ApplicationListener{
 
 
 
-            if((cannonBall.x > width || cannonBall.x < 0 || cannonBall.y > height || cannonBall.y < 0)){
+            if((cannonBall.point.x > width || cannonBall.point.x < 0 || cannonBall.point.y > height || cannonBall.point.y < 0)){
                 cannonBall.visible = false;
                 //lines.clear();
             }
@@ -100,17 +98,16 @@ public class CannonEngine implements ApplicationListener{
                     cannon.angle = -60;
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
-                cannonBall.x = width / 2;
-                cannonBall.y = 0;
+                cannonBall.point = new Point2D(cannon.point);
                 cannonBall.visible = true;
                 float cannonBallAngle = (MathUtils.PI / 180) * (cannon.angle + 90);
-                this.cannonBall.motionX = 300.0f * MathUtils.cos(cannonBallAngle);
-                this.cannonBall.motionY = 300.0f * MathUtils.sin(cannonBallAngle);
+                this.cannonBall.motion.x = 300.0f * MathUtils.cos(cannonBallAngle);
+                this.cannonBall.motion.y = 300.0f * MathUtils.sin(cannonBallAngle);
 
             }
 
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                lines.add(new Line(Gdx.input.getX(), Gdx.input.getY(), 0, 0));
+                //lines.add(new Line(Gdx.input.getX(), Gdx.input.getY(), 0, 0));
             }
         }
     }
@@ -131,37 +128,33 @@ public class CannonEngine implements ApplicationListener{
     }
 
     private void collide(CannonBallNew cannonBall, Line line, float deltaTime){
-        Point2D n = new Point2D(0,0);
-        n.x = -(line.yy-line.y);
-        n.y = line.xx - line.x;
+        Vector2D n = new Vector2D();
+        n.x = -(line.pointB.y-line.pointA.y);
+        n.y = line.pointB.x - line.pointA.x;
 
-        float tHit = n.x * (line.x - cannonBall.x) + n.y * (line.y - cannonBall.y)
-                     / (n.x * cannonBall.motionX + n.y * cannonBall.motionY);
+        float tHit = n.x * (line.pointA.x - cannonBall.point.x) + n.y * (line.pointA.y - cannonBall.point.y)
+                     / (n.x * cannonBall.motion.x + n.y * cannonBall.motion.y);
 
         if(tHit <= deltaTime && tHit > 0){
             Point2D pHit = new Point2D(0,0);
-            pHit.x = cannonBall.x + cannonBall.motionX * tHit;
-            pHit.y = cannonBall.y + cannonBall.motionY * tHit;
+            pHit.x = cannonBall.point.x + cannonBall.motion.x * tHit;
+            pHit.y = cannonBall.point.y + cannonBall.motion.y * tHit;
 
-            if((pHit.x >= line.x && pHit.x <= line.xx) || (pHit.x >= line.xx && pHit.x <= line.x)){
-                Point2D reflectedMotion = new Point2D(0,0);
-                System.out.println("Collison");
+            if((pHit.x >= line.pointA.x && pHit.x <= line.pointB.x) || (pHit.x >= line.pointB.x && pHit.x <= line.pointA.x)){
+                Vector2D reflectedMotion = new Vector2D();
 
                 float lengthOfN = (float) Math.sqrt(n.x * n.x + n.y * n.y);
                 n.x = n.x / lengthOfN;
                 n.y = n.y / lengthOfN;
 
-                float aDotN = cannonBall.motionX * n.x + cannonBall.motionY * n.y;
+                float aDotN = cannonBall.motion.x * n.x + cannonBall.motion.y * n.y;
 
-                reflectedMotion.x = cannonBall.motionX - 2 * aDotN * n.x;
-                reflectedMotion.y = cannonBall.motionY - 2 * aDotN * n.y;
+                reflectedMotion.x = cannonBall.motion.x - 2 * aDotN * n.x;
+                reflectedMotion.y = cannonBall.motion.y - 2 * aDotN * n.y;
 
-                cannonBall.motionX = reflectedMotion.x;
-                cannonBall.motionY = reflectedMotion.y;
+                cannonBall.motion = reflectedMotion;
             }
-
         }
-
     }
 
 

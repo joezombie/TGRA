@@ -14,15 +14,13 @@ public class CannonBall {
     public int firstIndex;
     public int vertexCount;
     public int openGLPrimitiveType;
-    public float x;
-    public float y;
+    public Point2D point;
     public boolean visible = false;
-    public CannonBall(float radius, int sides, Vector<Point2D> vertexList, float x, float y){
+    public CannonBall(float radius, int sides, Point2D point, Vector<Point2D> vertexList){
         this.firstIndex = vertexList.size();
         this.vertexCount = sides + 2;
         this.openGLPrimitiveType = GL11.GL_TRIANGLE_FAN;
-        this.x = x;
-        this.y = y;
+        this.point = point;
 
         float step = (MathUtils.PI * 2) / sides;
         float angle = 0;
@@ -40,7 +38,7 @@ public class CannonBall {
             Gdx.gl11.glColor4f(1f, 0f, 0f, 1f);
             Gdx.gl11.glVertexPointer(2, GL11.GL_FLOAT, 0, floatBuffer);
             Gdx.gl11.glPushMatrix();
-            Gdx.gl11.glTranslatef(x, y, 0);
+            Gdx.gl11.glTranslatef(point.x, point.y, 0);
             Gdx.gl11.glDrawArrays(openGLPrimitiveType, firstIndex, vertexCount);
             Gdx.gl11.glPopMatrix();
         }
