@@ -34,6 +34,11 @@ public class Point2D {
         return result;
     }
 
+    @Override
+    public String toString(){
+        return "X:" + Float.toString(this.x) + " Y:" + Float.toString(this.y);
+    }
+
     public static Point2D multiply(Point2D a, Point2D b){
         return new Point2D(a.x * b.x, a.y * b.y);
     }

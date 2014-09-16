@@ -16,11 +16,14 @@ public class CannonBall {
     public int openGLPrimitiveType;
     public Point2D point;
     public boolean visible = false;
+    public float radius;
+
     public CannonBall(float radius, int sides, Point2D point, Vector<Point2D> vertexList){
         this.firstIndex = vertexList.size();
         this.vertexCount = sides + 2;
         this.openGLPrimitiveType = GL11.GL_TRIANGLE_FAN;
         this.point = point;
+        this.radius = radius;
 
         float step = (MathUtils.PI * 2) / sides;
         float angle = 0;

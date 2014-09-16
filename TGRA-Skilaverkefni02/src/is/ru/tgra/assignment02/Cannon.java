@@ -14,10 +14,6 @@ public class Cannon{
     public int vertexCount;
     public int openGLPrimitiveType;
     public Point2D point;
-    public float red = 1f;
-    public float green = 1f;
-    public float blue = 1f;
-    public float alpha = 1f;
     public float angle;
 
     public Cannon(float width, float height, Point2D point, Vector<Point2D> vertexList){
@@ -40,12 +36,5 @@ public class Cannon{
         Gdx.gl11.glRotatef(angle, 0, 0, 1);
         Gdx.gl11.glDrawArrays(openGLPrimitiveType, firstIndex, vertexCount);
         Gdx.gl11.glPopMatrix();
-    }
-
-    public void setColor(float red, float green, float blue, float alpha){
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
-        this.alpha = alpha;
     }
 }

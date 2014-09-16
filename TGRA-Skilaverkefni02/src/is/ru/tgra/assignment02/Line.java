@@ -16,11 +16,6 @@ public class Line {
     public int openGLPrimitiveType;
     public Point2D pointA;
     public Point2D pointB;
-    public float red = 1f;
-    public float green = 1f;
-    public float blue = 1f;
-    public float alpha = 1f;
-
 
     private FloatBuffer vertexBuffer;
 
@@ -58,12 +53,5 @@ public class Line {
         Gdx.gl11.glLineWidth(20);
         Gdx.gl11.glDrawArrays(openGLPrimitiveType, firstIndex, vertexCount);
         Gdx.gl11.glPopMatrix();
-    }
-
-    public void setColor(float red, float green, float blue, float alpha){
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
-        this.alpha = alpha;
     }
 }
