@@ -19,4 +19,10 @@ public class Point3D
 		y = yy;
 		z = zz;
 	}
+
+    public void add(Vector3D v){
+        x = x + v.x;
+        y = y + v.y;
+        z = z + v.z;
+    }
 }

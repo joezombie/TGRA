@@ -3,13 +3,14 @@ package com.tgra;
 import com.badlogic.gdx.graphics.GL11;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 
 public class Camera
 {
-	Point3D eye;
-	Vector3D u;
-	Vector3D v;
-	Vector3D n;
+	public Point3D eye;
+	public Vector3D u;
+	public Vector3D v;
+	public Vector3D n;
 
 	public Camera(Point3D pEye, Point3D pCenter, Vector3D up)
 	{
@@ -34,4 +35,19 @@ public class Camera
 		Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW);
 		Gdx.gl11.glLoadMatrixf(matrix, 0);
 	}
+
+    public void slide(float delU, float delV, float delN){
+        eye.add(Vector3D.scale(u, delU));
+        eye.add(Vector3D.scale(v, delV));
+        eye.add(Vector3D.scale(n, delN));
+    }
+
+    public void roll(float angle){
+        float cos = MathUtils.cos(angle * MathUtils.PI / 100.0f);
+        float sin = MathUtils.sin(angle * MathUtils.PI / 100.0f);
+
+        Vector3D newU = Vector3D.add(Vector3D.scale(v, cos), Vector3D.scale(v, sin));
+        v = Vector3D.add(Vector3D.scale(u, -sin), Vector3D.scale(v, cos));
+        u = newU;
+    }
 }

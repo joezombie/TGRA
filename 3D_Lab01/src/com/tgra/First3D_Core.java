@@ -10,6 +10,8 @@ import com.badlogic.gdx.Gdx;
 
 public class First3D_Core implements ApplicationListener
 {
+    Camera camera;
+
 	@Override
 	public void create() {
 		// TODO Auto-generated method stub
@@ -40,6 +42,8 @@ public class First3D_Core implements ApplicationListener
 									  0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f});
 		vertexBuffer.rewind();
 		Gdx.gl11.glVertexPointer(3, GL11.GL_FLOAT, 0, vertexBuffer);
+
+        camera = new Camera(new Point3D(3.0f, 3.0f, 3.0f), new Point3D(0.0f, 0.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f));
 	}
 
 	@Override
@@ -53,10 +57,20 @@ public class First3D_Core implements ApplicationListener
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+    boolean movingRight = false;
+
 	private void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
+
+        if(movingRight){
+            camera.slide(1 * deltaTime, 0, 0);
+
+        }else {
+            camera.slide(-1 * deltaTime, 0, 0);
+        }
+
 	}
 	
 	private void drawBox()
@@ -80,8 +94,9 @@ public class First3D_Core implements ApplicationListener
 		Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT|GL11.GL_DEPTH_BUFFER_BIT);
 
 		Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW);
-		Gdx.gl11.glLoadIdentity();
-		Gdx.glu.gluLookAt(Gdx.gl11, 3.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+        camera.setModelViewMatrix();
+		//Gdx.gl11.glLoadIdentity();
+		//Gdx.glu.gluLookAt(Gdx.gl11, 3.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
 		float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
 		Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_DIFFUSE, lightDiffuse, 0);

@@ -47,4 +47,14 @@ public class Vector3D
 	{
 		return new Vector3D(P1.y*P2.z - P1.z*P2.y, P1.z*P2.x - P1.x*P2.z, P1.x*P2.y - P1.y*P2.x);
 	}
+
+    public static Vector3D scale(Vector3D v, float s){
+
+        return new Vector3D(v.x * s, v.y * s, v.z * s);
+
+    }
+
+    public static Vector3D add(Vector3D v1, Vector3D v2){
+        return new Vector3D(v1.x + v2.x, v1.y + v2.y, v1.z+ v2.z);
+    }
 }
