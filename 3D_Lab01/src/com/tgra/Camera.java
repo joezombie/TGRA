@@ -47,7 +47,7 @@ public class Camera
         float sin = MathUtils.sin(angle * MathUtils.PI / 100.0f);
 
         Vector3D newU = Vector3D.add(Vector3D.scale(v, cos), Vector3D.scale(v, sin));
-        v = Vector3D.add(Vector3D.scale(u, -sin), Vector3D.scale(v, cos));
+        v = Vector3D.add(Vector3D.scale(v, -sin), Vector3D.scale(v, cos));
         u = newU;
     }
 }

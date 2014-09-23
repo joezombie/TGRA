@@ -64,12 +64,15 @@ public class First3D_Core implements ApplicationListener
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
+        camera.roll(90.0f * deltaTime);
+        /*
         if(movingRight){
             camera.slide(1 * deltaTime, 0, 0);
 
         }else {
             camera.slide(-1 * deltaTime, 0, 0);
         }
+        */
 
 	}
 	
