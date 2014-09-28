@@ -3,6 +3,7 @@ package com.tgra;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -14,7 +15,9 @@ import java.nio.FloatBuffer;
 public class Assignment3Engine implements ApplicationListener{
     int width = 800;
     int height = 600;
+    Boolean isThirdPerson = false;
     Camera camFirstPerson;
+    Camera camThirdPerson;
     Camera camTopDown;
     FloatBuffer vertexBuffer;
     FloatBuffer vertexBuffer2DBox;
@@ -52,6 +55,9 @@ public class Assignment3Engine implements ApplicationListener{
         camTopDown = new Camera();
         camTopDown.perspective(40.0f, 1.333333f, 5.0f, 20.0f);
 
+        camThirdPerson = new Camera();
+        camThirdPerson.perspective(40.0f, 1.333333f, 5.0f, 20.0f);
+
         arrow = new Arrow();
         arrow.create();
 
@@ -60,6 +66,21 @@ public class Assignment3Engine implements ApplicationListener{
         vertexBuffer2DBox.put(new float[] {0,0, 0,1, 1,0, 1,1});
         vertexBuffer2DBox.rewind();
 
+        setInputProcessor();
+
+    }
+
+    private void setInputProcessor(){
+        Gdx.input.setInputProcessor(new Assignment3InputProcessor() {
+            @Override
+            public boolean keyDown(int i) {
+                switch (i){
+                    case Input.Keys.V:
+                        isThirdPerson = !isThirdPerson;
+                }
+                return false;
+            }
+        });
     }
 
     private void update(){
@@ -76,41 +97,45 @@ public class Assignment3Engine implements ApplicationListener{
         if(Gdx.input.isKeyPressed(Input.Keys.S)){
             camFirstPerson.slide(0, 0, 1.0f * deltaTime);
         }
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+            camFirstPerson.yaw(30.0f * deltaTime);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+            camFirstPerson.yaw(-30.0f * deltaTime);
+        }
+
+        if(isThirdPerson){
+            camThirdPerson.lookAt(new Point3D(camFirstPerson.eye.x, camFirstPerson.eye.y + 5.0f, camFirstPerson.eye.z + 7.0f),
+                    camFirstPerson.eye, new Vector3D(0, 1, 0));
+        }
 
     }
 
     private void display(){
         Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT|GL11.GL_DEPTH_BUFFER_BIT);
 
-        //Gdx.gl11.glMatrixMode(GL11.GL_PROJECTION);
-        //Gdx.gl11.glLoadIdentity();
-        //Gdx.glu.gluPerspective(Gdx.gl11, 90, 1.333333f, 1.0f, 10.0f);
-
-        //Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW);
-        //Gdx.gl11.glLoadIdentity();
-        //Gdx.glu.gluLookAt(Gdx.gl11, -1.0f, -1.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-
         for(int i = 0; i < 2; i++) {
             if (i == 0) {
                 Gdx.gl11.glViewport(0, 0, width, height);
-                //cam.setProjectionMatrix();
-                //cam.setModelViewMatrix();
-                camFirstPerson.setMatrices();
+
+                if(isThirdPerson) {
+                    camThirdPerson.setMatrices();
+                } else {
+                    camFirstPerson.setMatrices();
+                }
+
             } else {
                 Gdx.gl11.glViewport(0, height - 240, 320, 240);
                 Gdx.gl11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 
-
                 Gdx.gl11.glDisable(GL11.GL_DEPTH_TEST);
                 Gdx.gl11.glDisable(GL11.GL_LIGHTING);
-
 
                 Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW);
                 Gdx.gl11.glLoadIdentity();
                 Gdx.gl11.glMatrixMode(GL11.GL_PROJECTION);
                 Gdx.gl11.glLoadIdentity();
                 Gdx.glu.gluOrtho2D(Gdx.gl10, 0, 1, 0, 1);
-
 
                 Gdx.gl11.glVertexPointer(2, GL11.GL_FLOAT, 0, vertexBuffer2DBox);
                 Gdx.gl11.glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
@@ -124,8 +149,9 @@ public class Assignment3Engine implements ApplicationListener{
                         camFirstPerson.eye, new Vector3D(0, 0, -1));
                 camTopDown.setMatrices();
 
-            }
 
+
+            }
 
             float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
             Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_DIFFUSE, lightDiffuse, 0);
@@ -150,7 +176,8 @@ public class Assignment3Engine implements ApplicationListener{
             drawBox();
             Gdx.gl11.glPopMatrix();
 
-            if (i == 1) {
+
+            if (i == 1 || isThirdPerson) {
                 materialDiffuse[0] = 1.0f;
                 materialDiffuse[1] = 1.0f;
                 materialDiffuse[2] = 1.0f;
@@ -159,8 +186,6 @@ public class Assignment3Engine implements ApplicationListener{
                 Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
 
                 Gdx.gl11.glPushMatrix();
-                //Gdx.gl11.glTranslatef(0.0f, 0.0f, 2.0f);
-                //Gdx.gl11.glRotatef(arrowRotation, 0.0f, 1.0f, 0.0f);
 
                 float[] matrix = new float[16];
                 matrix[0] = camFirstPerson.u.x;
