@@ -50,6 +50,7 @@ public class Assignment3Engine implements ApplicationListener{
 
         camFirstPerson = new Camera();
         camFirstPerson.lookAt(new Point3D(0.0f, 0.0f, 5.0f), new Point3D(0.0f, 0.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f));
+        //                       fov, aspect_ratio, nearPlane, farPlane
         camFirstPerson.perspective(90.0f, 1.333333f, 1.0f, 10.0f);
 
         camTopDown = new Camera();
