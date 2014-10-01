@@ -1,4 +1,4 @@
-package com.tgra;
+package com.tgra.Shapes;
 
 import java.nio.FloatBuffer;
 
