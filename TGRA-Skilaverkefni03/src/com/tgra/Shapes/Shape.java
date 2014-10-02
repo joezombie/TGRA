@@ -14,4 +14,6 @@ public interface Shape {
     public void setColor(ColorRGB color);
     public ColorRGB getColor();
     public void draw();
+    public float getRadius();
+    public void setRadius(float radius);
 }

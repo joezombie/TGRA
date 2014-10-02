@@ -6,7 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.utils.BufferUtils;
 
-public class Arrow {
+public class Arrow extends ShapeAbstract {
 	
 	FloatBuffer vertexBuffer;
 
@@ -30,6 +30,8 @@ public class Arrow {
 									  -1.0f, 0.25f, 0.0f, 0.0f, 0.25f, 1.0f, -1.0f, -0.25f, 0.0f, 0.0f, -0.25f, 1.0f,
 									  0.0f, 0.25f, 1.0f, 1.0f, 0.25f, 0.0f, 0.0f, -0.25f, 1.0f, 1.0f, -0.25f, 0.0f});
 		vertexBuffer.rewind();
+
+        setSize(2.0f);
 	}
 	
 	public void display()
@@ -62,4 +64,9 @@ public class Arrow {
 		Gdx.gl11.glNormal3f(sqrt2, 0.0f, sqrt2);
 		Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 38, 4);
 	}
+
+    @Override
+    public void draw(){
+        display();
+    }
 }

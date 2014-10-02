@@ -57,4 +57,13 @@ public class Vector3D
 	{
 		return new Vector3D(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z);
 	}
+
+    @Override
+    public String toString() {
+        return "Vector3D{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
 }

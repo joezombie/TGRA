@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL11;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.tgra.Shapes.Arrow;
 import com.tgra.Shapes.Box;
@@ -28,6 +29,8 @@ public class Assignment3Engine implements ApplicationListener{
     Camera camTopDown;
     List<Light> lights;
     List<Shape> shapes;
+    Box slidingBox;
+    boolean slidingLeft;
     //FloatBuffer vertexBuffer;
     FloatBuffer vertexBuffer2DBox;
     Arrow arrow;
@@ -36,6 +39,7 @@ public class Assignment3Engine implements ApplicationListener{
     public void create() {
         // Set ratio
         ratio = width.floatValue() / height.floatValue();
+
         // OpenGL setup
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
         Gdx.gl11.glEnable(GL11.GL_DEPTH_TEST);
@@ -77,33 +81,20 @@ public class Assignment3Engine implements ApplicationListener{
         // Walls
         Wall.loadVertices();
 
-        shapes.add(new Wall(new Point3D(5.0f, 0.0f, 5.0f), 1.0f, new ColorRGB(1.0f, 1.0f, 0f)));
+        //shapes.add(new Wall(new Point3D(5.0f, 0.0f, 5.0f), 1.0f, new ColorRGB(1.0f, 1.0f, 0f)));
 
         // Boxes
         Box.loadVertices();
 
-        shapes.add(new Box(new Point3D(0, 0, 0), 10.0f, new ColorRGB(1.0f, 0, 0)));
+        shapes.add(new Box(new Point3D(5.0f, 0.0f, 5.0f), 1.0f, new ColorRGB(1.0f, 0, 0)));
+        slidingBox = new Box(new Point3D(2.0f, 0.0f, 2.0f), 1.0f, new ColorRGB(1.0f, 1.0f, 0));
+        slidingLeft = true;
+        shapes.add(slidingBox);
 
         // Other
 
         arrow = new Arrow();
         arrow.create();
-
-
-/*        vertexBuffer = BufferUtils.newFloatBuffer(72);
-        vertexBuffer.put(new float[] {-0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f,
-                0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
-                -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f,
-                0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,
-                0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f});
-        vertexBuffer.rewind();*/
 
         vertexBuffer2DBox = BufferUtils.newFloatBuffer(8);
         vertexBuffer2DBox.put(new float[] {0,0, 0,1, 1,0, 1,1});
@@ -128,18 +119,40 @@ public class Assignment3Engine implements ApplicationListener{
 
     private void update(){
         float deltaTime = Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Input.Keys.D)){
-            camFirstPerson.slide(1.0f * deltaTime, 0, 0);
+
+        //System.out.println(slidingBox.getPosition());
+
+
+        if(slidingBox.getPosition().x > 3.0f){
+            slidingLeft = true;
+        }else if(slidingBox.getPosition().x < -3.0f){
+            slidingLeft = false;
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.A)){
-            camFirstPerson.slide(-1.0f * deltaTime, 0, 0);
+
+        if(slidingLeft){
+            slidingBox.getPosition().x -= 1.0f * deltaTime;
+            //System.out.println(1.0f * deltaTime);
+
+        } else {
+            slidingBox.getPosition().add(new Vector3D(1.0f * deltaTime, 0, 0));
+            System.out.println(1.0f * deltaTime);
         }
+
+        slidingBox.getPosition().add(new Vector3D(1.0f * deltaTime,0, 0));
+
         if(Gdx.input.isKeyPressed(Input.Keys.W)){
             camFirstPerson.slide(0, 0, -1.0f * deltaTime);
         }
         if(Gdx.input.isKeyPressed(Input.Keys.S)){
             camFirstPerson.slide(0, 0, 1.0f * deltaTime);
         }
+        if(Gdx.input.isKeyPressed(Input.Keys.A)){
+            camFirstPerson.slide(-1.0f * deltaTime, 0, 0);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.D)){
+            camFirstPerson.slide(1.0f * deltaTime, 0, 0);
+        }
+
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
             camFirstPerson.yaw(30.0f * deltaTime);
         }
@@ -147,9 +160,20 @@ public class Assignment3Engine implements ApplicationListener{
             camFirstPerson.yaw(-30.0f * deltaTime);
         }
 
+        arrow.setPosition(camFirstPerson.eye);
+
         if(isThirdPerson){
             camThirdPerson.lookAt(new Point3D(camFirstPerson.eye.x, camFirstPerson.eye.y + 5.0f, camFirstPerson.eye.z + 7.0f),
                     camFirstPerson.eye, new Vector3D(0, 1, 0));
+
+        }
+
+        for(Shape s : shapes){
+            if(radiusHit(s, arrow)){
+                while(radiusHit(s, arrow)){
+                    camFirstPerson.slide(0.01f, 0, 0);
+                }
+            }
         }
 
     }
@@ -203,31 +227,6 @@ public class Assignment3Engine implements ApplicationListener{
                 Gdx.gl11.glLightfv(glLight[li], GL11.GL_POSITION, lights.get(li).lightPosition, 0);
             }
 
-            /*
-            float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
-            Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_DIFFUSE, lightDiffuse, 0);
-
-            float[] lightPosition = {5.0f, 10.0f, 15.0f, 0.0f};
-            Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition, 0);
-            */
-/*            float[] materialDiffuse = {1.0f, 1.0f, 0.0f, 1.0f};
-            Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
-
-            drawBox();
-
-            materialDiffuse[0] = 0.0f;
-            materialDiffuse[1] = 0.0f;
-            materialDiffuse[2] = 1.0f;
-            materialDiffuse[3] = 1.0f;
-
-            Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
-
-            Gdx.gl11.glPushMatrix();
-            Gdx.gl11.glTranslatef(3.0f, 1.0f, 0.0f);
-            drawBox();
-            Gdx.gl11.glPopMatrix();*/
-
-
             for(Shape s : shapes){
                 s.draw();
             }
@@ -265,23 +264,15 @@ public class Assignment3Engine implements ApplicationListener{
         }
     }
 
-/*    private void drawBox()
-    {
-        Gdx.gl11.glVertexPointer(3, GL11.GL_FLOAT, 0, vertexBuffer);
+    private boolean radiusHit(Shape a, Shape b){
+        float distance = (float) Math.sqrt(Math.pow(a.getPosition().x - b.getPosition().x, 2)
+                       + Math.pow(a.getPosition().z - b.getPosition().z, 2));
 
-        Gdx.gl11.glNormal3f(0.0f, 0.0f, -1.0f);
-        Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
-        Gdx.gl11.glNormal3f(1.0f, 0.0f, 0.0f);
-        Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 4, 4);
-        Gdx.gl11.glNormal3f(0.0f, 0.0f, 1.0f);
-        Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 8, 4);
-        Gdx.gl11.glNormal3f(-1.0f, 0.0f, 0.0f);
-        Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 12, 4);
-        Gdx.gl11.glNormal3f(0.0f, 1.0f, 0.0f);
-        Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 16, 4);
-        Gdx.gl11.glNormal3f(0.0f, -1.0f, 0.0f);
-        Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 20, 4);
-    }*/
+        if(distance <= a.getRadius() + b.getRadius()){
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public void resume() {

@@ -5,6 +5,10 @@
     <libelement value="jar://$MODULE_DIR$/libs/gdx-backend-lwjgl.jar!/" />
     <libelement value="jar://$MODULE_DIR$/libs/gdx-natives.jar!/" />
     <libelement value="jar://$MODULE_DIR$/libs/gdx.jar!/" />
+    <libelement value="file://libs/gdx-backend-lwjgl-natives.jar" />
+    <libelement value="file://libs/gdx-backend-lwjgl.jar" />
+    <libelement value="file://libs/gdx-natives.jar" />
+    <libelement value="file://libs/gdx.jar" />
     <src_description expected_position="0">
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
     </src_description>
@@ -17,42 +21,6 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="module-library">
-      <library name="gdx-backend-lwjgl-natives.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/gdx-backend-lwjgl-natives.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="gdx-backend-lwjgl.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/gdx-backend-lwjgl.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="gdx-natives.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/gdx-natives.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="gdx.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/gdx.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="libs" level="project" />
   </component>
 </module>
