@@ -16,4 +16,5 @@ public interface Shape {
     public void draw();
     public float getRadius();
     public void setRadius(float radius);
+    public boolean collides(Shape shape);
 }

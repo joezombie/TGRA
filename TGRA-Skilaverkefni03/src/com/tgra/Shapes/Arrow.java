@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.utils.BufferUtils;
+import com.tgra.Vector3D;
 
 public class Arrow extends ShapeAbstract {
 	
@@ -68,5 +69,10 @@ public class Arrow extends ShapeAbstract {
     @Override
     public void draw(){
         display();
+    }
+
+    @Override
+    public boolean collides(Shape shape){
+        return false;
     }
 }

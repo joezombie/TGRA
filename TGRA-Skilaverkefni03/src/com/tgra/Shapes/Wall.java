@@ -23,21 +23,28 @@ public class Wall extends ShapeAbstract {
     public static void loadVertices()
     {
         vertexBuffer = BufferUtils.newFloatBuffer(72);
-        vertexBuffer.put(new float[] {-0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
+        vertexBuffer.put(new float[] {
+                -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
                 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f,
+
                 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f,
                 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+
                 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
                 -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
+
                 -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
                 -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
+
                 -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f,
                 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
+
                 -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,
                 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f});
         vertexBuffer.rewind();
     }
 
+    @Override
     public void draw()
     {
         Gdx.gl11.glPushMatrix();
@@ -64,5 +71,11 @@ public class Wall extends ShapeAbstract {
         Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 20, 4);
 
         Gdx.gl11.glPopMatrix();
+    }
+
+    @Override
+    public boolean collides(Shape shape){
+
+        return false;
     }
 }

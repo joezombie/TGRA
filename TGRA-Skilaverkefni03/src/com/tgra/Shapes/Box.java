@@ -66,4 +66,20 @@ public class Box extends ShapeAbstract {
 
         Gdx.gl11.glPopMatrix();
     }
+
+    @Override
+    public boolean collides(Shape shape){
+        float halfSide = (1f * size)/2;
+        float xNear = position.x - halfSide;
+        float zNear = position.z - halfSide;
+        float xFar = position.x + halfSide;
+        float zFar = position.z + halfSide;
+
+        if(shape.getPosition().x + shape.getRadius() > xNear && shape.getPosition().x - shape.getRadius() < xFar){
+            if(shape.getPosition().z + shape.getRadius() > zNear && shape.getPosition().z - shape.getRadius() < zFar){
+                return true;
+            }
+        }
+        return false;
+    }
 }

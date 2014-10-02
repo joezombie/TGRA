@@ -30,8 +30,8 @@ public class Assignment3Engine implements ApplicationListener{
     List<Light> lights;
     List<Shape> shapes;
     Box slidingBox;
+    Box rotatingBox;
     boolean slidingLeft;
-    //FloatBuffer vertexBuffer;
     FloatBuffer vertexBuffer2DBox;
     Arrow arrow;
 
@@ -68,33 +68,38 @@ public class Assignment3Engine implements ApplicationListener{
         camFirstPerson = new Camera();
         camFirstPerson.lookAt(new Point3D(0.0f, 0.0f, 5.0f), new Point3D(0.0f, 0.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f));
         //                       fov, aspect_ratio, nearPlane, farPlane
-        camFirstPerson.perspective(75.0f, ratio, 1.0f, 10.0f);
+        camFirstPerson.perspective(75.0f, ratio, 1.0f, 100.0f);
 
         camTopDown = new Camera();
         camTopDown.perspective(40.0f, ratio, 5.0f, 20.0f);
 
         camThirdPerson = new Camera();
-        camThirdPerson.perspective(40.0f, ratio, 5.0f, 20.0f);
+        camThirdPerson.perspective(40.0f, ratio, 5.0f, 100.0f);
 
         // Shapes
         shapes = new ArrayList<Shape>();
         // Walls
         Wall.loadVertices();
 
-        //shapes.add(new Wall(new Point3D(5.0f, 0.0f, 5.0f), 1.0f, new ColorRGB(1.0f, 1.0f, 0f)));
+        shapes.add(new Wall(new Point3D(-2.0f, 0, -3.0f), 1.0f, new ColorRGB(0.0f, 1.0f, 0f)));
 
         // Boxes
         Box.loadVertices();
 
         shapes.add(new Box(new Point3D(5.0f, 0.0f, 5.0f), 1.0f, new ColorRGB(1.0f, 0, 0)));
+
+        rotatingBox = new Box(new Point3D(30.0f, 0.0f, 0.0f), 20.0f, new ColorRGB(0.3f, 0.1f, 0.1f));
+        shapes.add(rotatingBox);
+
+
         slidingBox = new Box(new Point3D(2.0f, 0.0f, 2.0f), 1.0f, new ColorRGB(1.0f, 1.0f, 0));
         slidingLeft = true;
         shapes.add(slidingBox);
 
         // Other
-
         arrow = new Arrow();
         arrow.create();
+        arrow.setPosition(camFirstPerson.eye);
 
         vertexBuffer2DBox = BufferUtils.newFloatBuffer(8);
         vertexBuffer2DBox.put(new float[] {0,0, 0,1, 1,0, 1,1});
@@ -108,7 +113,7 @@ public class Assignment3Engine implements ApplicationListener{
         Gdx.input.setInputProcessor(new Assignment3InputProcessor() {
             @Override
             public boolean keyDown(int i) {
-                switch (i){
+                switch (i) {
                     case Input.Keys.V:
                         isThirdPerson = !isThirdPerson;
                 }
@@ -139,28 +144,38 @@ public class Assignment3Engine implements ApplicationListener{
         }
 
         slidingBox.getPosition().add(new Vector3D(1.0f * deltaTime,0, 0));
+        boolean arrowCollides = false;
 
-        if(Gdx.input.isKeyPressed(Input.Keys.W)){
+
+
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             camFirstPerson.slide(0, 0, -1.0f * deltaTime);
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.S)){
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
             camFirstPerson.slide(0, 0, 1.0f * deltaTime);
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.A)){
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             camFirstPerson.slide(-1.0f * deltaTime, 0, 0);
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.D)){
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             camFirstPerson.slide(1.0f * deltaTime, 0, 0);
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camFirstPerson.yaw(30.0f * deltaTime);
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             camFirstPerson.yaw(-30.0f * deltaTime);
         }
 
         arrow.setPosition(camFirstPerson.eye);
+
+        for(Shape s : shapes){
+            if(s.collides(arrow)){
+                camFirstPerson.slide(camFirstPerson.n.x * deltaTime, camFirstPerson.n.y * deltaTime, camFirstPerson.n.z * deltaTime);
+            }
+        }
 
         if(isThirdPerson){
             camThirdPerson.lookAt(new Point3D(camFirstPerson.eye.x, camFirstPerson.eye.y + 5.0f, camFirstPerson.eye.z + 7.0f),
@@ -168,13 +183,7 @@ public class Assignment3Engine implements ApplicationListener{
 
         }
 
-        for(Shape s : shapes){
-            if(radiusHit(s, arrow)){
-                while(radiusHit(s, arrow)){
-                    camFirstPerson.slide(0.01f, 0, 0);
-                }
-            }
-        }
+
 
     }
 
@@ -235,6 +244,8 @@ public class Assignment3Engine implements ApplicationListener{
                 float[] materialDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
 
                 Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
+
+                
 
                 Gdx.gl11.glPushMatrix();
 
