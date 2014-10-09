@@ -32,7 +32,7 @@ public class Arrow extends ShapeAbstract {
 									  0.0f, 0.25f, 1.0f, 1.0f, 0.25f, 0.0f, 0.0f, -0.25f, 1.0f, 1.0f, -0.25f, 0.0f});
 		vertexBuffer.rewind();
 
-        setSize(2.0f);
+        setSize(2.2f);
 	}
 	
 	public void display()
