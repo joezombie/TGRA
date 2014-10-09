@@ -4,13 +4,16 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL11;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.g3d.loaders.obj.ObjLoader;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.tgra.Shapes.Arrow;
 import com.tgra.Shapes.Box;
 import com.tgra.Shapes.Shape;
 import com.tgra.Shapes.Wall;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +37,8 @@ public class Assignment3Engine implements ApplicationListener{
     boolean slidingLeft;
     FloatBuffer vertexBuffer2DBox;
     Arrow arrow;
+    Mesh monkey;
+    Vector3D monkeyR;
 
     @Override
     public void create() {
@@ -46,6 +51,17 @@ public class Assignment3Engine implements ApplicationListener{
         Gdx.gl11.glEnable(GL11.GL_NORMALIZE);
         Gdx.gl11.glClearColor(0.2f, 0.0f, 0.1f, 1.0f);
         Gdx.gl11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+
+        // Monkey
+        try {
+            InputStream in = Gdx.files.internal("assets/monkey.obj").read();
+            monkey =  ObjLoader.loadObj(in);
+            in.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        monkeyR = new Vector3D(0, 0, 0);
 
         // Lights
         lights = new ArrayList<Light>();
@@ -81,7 +97,10 @@ public class Assignment3Engine implements ApplicationListener{
         // Walls
         Wall.loadVertices();
 
-        shapes.add(new Wall(new Point3D(-2.0f, 0, -3.0f), 1.0f, new ColorRGB(0.0f, 1.0f, 0f)));
+        shapes.add(new Wall(new Point3D(-2.5f, 0, 2.5f), 10.0f, false, new ColorRGB(0.0f, 1.0f, 0f)));
+        shapes.add(new Wall(new Point3D(2.5f, 0, -2.5f), 10.0f, true, new ColorRGB(0.0f, 1.0f, 0f)));
+        shapes.add(new Wall(new Point3D(7.5f, 0, 2.5f), 10.0f, false, new ColorRGB(0.0f, 1.0f, 0f)));
+        shapes.add(new Wall(new Point3D(2.5f, 0, 7.5f), 10.0f, true, new ColorRGB(0.0f, 1.0f, 0f)));
 
         // Boxes
         Box.loadVertices();
@@ -125,6 +144,10 @@ public class Assignment3Engine implements ApplicationListener{
     private void update(){
         float deltaTime = Gdx.graphics.getDeltaTime();
 
+        monkeyR.x += 30.0f * deltaTime;
+        monkeyR.z += 30.0f * deltaTime;
+
+        Point3D oldEye = new Point3D(camFirstPerson.eye);
         //System.out.println(slidingBox.getPosition());
 
 
@@ -173,7 +196,7 @@ public class Assignment3Engine implements ApplicationListener{
 
         for(Shape s : shapes){
             if(s.collides(arrow)){
-                camFirstPerson.slide(camFirstPerson.n.x * deltaTime, camFirstPerson.n.y * deltaTime, camFirstPerson.n.z * deltaTime);
+                camFirstPerson.eye = oldEye;
             }
         }
 
@@ -183,7 +206,8 @@ public class Assignment3Engine implements ApplicationListener{
 
         }
 
-
+        //lights.get(0).setLightPosition(new Point3D(camFirstPerson.eye.x - 10, camFirstPerson.eye.y + 10, camFirstPerson.eye.z - 10));
+        //lights.get(1).setLightPosition(new Point3D(camFirstPerson.eye.x + 10, camFirstPerson.eye.y + 10, camFirstPerson.eye.z - 10));
 
     }
 
@@ -226,9 +250,6 @@ public class Assignment3Engine implements ApplicationListener{
                         new Vector3D(0, 0, -1));
 
                 camTopDown.setMatrices();
-
-
-
             }
 
             for(int li = 0; li < lights.size() && li < glLight.length; li++){
@@ -240,12 +261,21 @@ public class Assignment3Engine implements ApplicationListener{
                 s.draw();
             }
 
+            Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, new float[]{0.545f, 0.271f, 0.075f, 1.0f}, 0);
+            Gdx.gl11.glPushMatrix();
+            Gdx.gl11.glTranslatef(0, 0, 2);
+            Gdx.gl11.glRotatef(monkeyR.x, monkeyR.y, monkeyR.z, 1);
+            Gdx.gl11.glScalef(0.5f, 0.5f, 0.5f);
+            monkey.render(GL11.GL_TRIANGLES);
+
+            Gdx.gl11.glPopMatrix();
+
             if (i == 1 || isThirdPerson) {
                 float[] materialDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
 
                 Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
 
-                
+
 
                 Gdx.gl11.glPushMatrix();
 

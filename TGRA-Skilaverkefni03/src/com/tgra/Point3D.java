@@ -12,6 +12,13 @@ public class Point3D
 		y = yy;
 		z = zz;
 	}
+
+    public Point3D(Point3D otherPoint)
+    {
+        x = otherPoint.x;
+        y = otherPoint.y;
+        z = otherPoint.z;
+    }
 	
 	public void set(float xx, float yy, float zz)
 	{
