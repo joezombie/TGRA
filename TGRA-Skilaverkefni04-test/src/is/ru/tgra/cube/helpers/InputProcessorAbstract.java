@@ -37,12 +37,10 @@ public abstract class InputProcessorAbstract implements InputProcessor{
     }
 
     @Override
-    public boolean touchMoved(int i, int i2) {
+    public boolean scrolled(int i) {
         return false;
     }
 
     @Override
-    public boolean scrolled(int i) {
-        return false;
-    }
+    public boolean mouseMoved(int i, int i2) { return false; }
 }

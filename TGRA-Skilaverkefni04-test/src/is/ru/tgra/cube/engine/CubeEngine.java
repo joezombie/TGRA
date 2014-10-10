@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -32,11 +33,14 @@ public class CubeEngine implements ApplicationListener {
     CubeLogger log = CubeLogger.getInstance();
     Guy guy;
     boolean controlCamera = false;
+    int fps;
 
     @Override
     public void create() {
         log.setDebug(true);
         log.debug("Create");
+
+
         // Set ratio
         resize(width, height);
 
@@ -101,6 +105,7 @@ public class CubeEngine implements ApplicationListener {
 
 
     private void update(){
+        fps = Gdx.graphics.getFramesPerSecond();
         float deltaTime = Gdx.graphics.getDeltaTime();
 
         if(controlCamera) {
@@ -191,11 +196,13 @@ public class CubeEngine implements ApplicationListener {
         }
 
         fontBatch.begin();
+        font.setColor(Color.WHITE);
         if(controlCamera){
             font.draw(fontBatch, "Camera", 20, height - 20);
         } else {
             font.draw(fontBatch, "Guy", 20, height - 20);
         }
+        font.draw(fontBatch, "FPS: " + fps, 20, height - 40);
         fontBatch.end();
     }
 
