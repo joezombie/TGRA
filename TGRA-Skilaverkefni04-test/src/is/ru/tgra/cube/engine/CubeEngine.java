@@ -60,7 +60,7 @@ public class CubeEngine implements ApplicationListener {
         lights = new ArrayList<Light>();
 
         light1 = new Light(GL11.GL_LIGHT0);
-        light1.setLightPosition(new Point3D(0.0f, 2.0f, 11.0f));
+        light1.setLightPosition(new Point3D(0.0f, 3.0f, 11.0f));
         light1.setLightDiffuse(new ColorRGB(1.0f, 1.0f, 1.0f));
         light1.setLightSpecular(new ColorRGB(0.0f, 0.0f, 0.0f));
         lights.add(light1);
@@ -72,7 +72,7 @@ public class CubeEngine implements ApplicationListener {
 
         // Cameras
         mainCamera = new Camera();
-        mainCamera.lookAt(new Point3D(0.0f, 2.0f, 11.0f), new Point3D(0.0f, 2.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f));
+        mainCamera.lookAt(new Point3D(0.0f, 3.0f, 11.0f), new Point3D(0.0f, 2.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f));
         //                       fov, aspect_ratio, nearPlane, farPlane
         mainCamera.perspective(90.0f, ratio, 10.0f, 100.0f);
 
@@ -87,6 +87,7 @@ public class CubeEngine implements ApplicationListener {
 
         shapes.add(new Box(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0)));
         shapes.add(new Box(new Point3D(6.0f, -2.0f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0)));
+        shapes.add(new Box(new Point3D(12.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0)));
 
         setInputProcessor();
 
@@ -196,18 +197,26 @@ public class CubeEngine implements ApplicationListener {
 
         mainCamera.setMatrices();
 
+        // Lights
+
+        //Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_AMBIENT, new float[] { 0.2f,0.2f, 0.2f, 1.0f }, 0);
+        Gdx.gl11.glLightModelfv(GL11.GL_AMBIENT, new float[]{0.2f, 0.2f, 0.2f, 1.0f}, 0);
+
+
+
         for(Light l : lights){
             Gdx.gl11.glLightfv(l.ID, GL11.GL_DIFFUSE, l.getLightDiffuse(), 0);
             Gdx.gl11.glLightfv(l.ID, GL11.GL_SPECULAR, l.getLightSpecular(), 0);
-            Gdx.gl11.glLightfv(l.ID, GL11.GL_POSITION, l.getLightDiffuse(), 0);
+            Gdx.gl11.glLightfv(l.ID, GL11.GL_POSITION, l.getLightPosition(), 0);
         }
-        float[] lightSpotDirection = {-mainCamera.n.x, -mainCamera.n.y, -mainCamera.n.z, 1.0f};
+        /*float[] lightSpotDirection = {-mainCamera.n.x, -mainCamera.n.y, -mainCamera.n.z, 1.0f};
         Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_SPOT_DIRECTION, lightSpotDirection, 0);
+        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_EXPONENT, 10.0f);
+        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_CUTOFF, 20.0f);
+        */
+        //
 
-        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_EXPONENT, 300.0f);
-        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_CUTOFF, 300.0f);
 
-        guy.draw();
 
         float[] materialDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
         Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
@@ -216,6 +225,8 @@ public class CubeEngine implements ApplicationListener {
         Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, materialSpecular, 0);
 
         Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, 90.0f);
+
+        guy.draw();
 
         for(Shape s : shapes){
             s.draw();
