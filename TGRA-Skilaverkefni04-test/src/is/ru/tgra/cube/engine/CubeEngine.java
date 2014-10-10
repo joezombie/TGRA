@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -29,6 +28,7 @@ public class CubeEngine implements ApplicationListener {
     float ratio;
     Camera mainCamera;
     List<Light> lights;
+    Light light1;
     List<Shape> shapes;
     CubeLogger log = CubeLogger.getInstance();
     Guy guy;
@@ -59,7 +59,11 @@ public class CubeEngine implements ApplicationListener {
         // Lights
         lights = new ArrayList<Light>();
 
-        lights.add(new Light());
+        light1 = new Light(GL11.GL_LIGHT0);
+        light1.setLightPosition(new Point3D(0.0f, 2.0f, 11.0f));
+        light1.setLightDiffuse(new ColorRGB(1.0f, 1.0f, 1.0f));
+        light1.setLightSpecular(new ColorRGB(0.0f, 0.0f, 0.0f));
+        lights.add(light1);
 
         for(int i = 0; i < lights.size() && i < glLight.length; i++){
             Gdx.gl11.glEnable(glLight[i]);
@@ -181,6 +185,9 @@ public class CubeEngine implements ApplicationListener {
             guy.getPosition().add(new Vector3D(0, -3.0f * deltaTime, 0));
             log.debug("Falling");
         }
+
+        light1.setLightPosition(new Point3D(mainCamera.eye.x, mainCamera.eye.y, mainCamera.eye.z));
+
     }
 
     private void display(){
@@ -189,10 +196,30 @@ public class CubeEngine implements ApplicationListener {
 
         mainCamera.setMatrices();
 
+        for(Light l : lights){
+            Gdx.gl11.glLightfv(l.ID, GL11.GL_DIFFUSE, l.getLightDiffuse(), 0);
+            Gdx.gl11.glLightfv(l.ID, GL11.GL_SPECULAR, l.getLightSpecular(), 0);
+            Gdx.gl11.glLightfv(l.ID, GL11.GL_POSITION, l.getLightDiffuse(), 0);
+        }
+        float[] lightSpotDirection = {-mainCamera.n.x, -mainCamera.n.y, -mainCamera.n.z, 1.0f};
+        Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_SPOT_DIRECTION, lightSpotDirection, 0);
+
+        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_EXPONENT, 300.0f);
+        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_CUTOFF, 300.0f);
+
         guy.draw();
+
+        float[] materialDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
+
+        float[] materialSpecular = {1.0f, 1.0f, 1.0f, 1.0f};
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, materialSpecular, 0);
+
+        Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, 90.0f);
 
         for(Shape s : shapes){
             s.draw();
+
         }
 
         fontBatch.begin();
