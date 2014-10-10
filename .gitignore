@@ -13,7 +13,7 @@ hs_err_pid*
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
 
-/*.iml
+*.iml
 
 ## Directory-based project format:
 .idea/
@@ -55,3 +55,7 @@ atlassian-ide-plugin.xml
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
+
+
+# Logfile
+cube.log
