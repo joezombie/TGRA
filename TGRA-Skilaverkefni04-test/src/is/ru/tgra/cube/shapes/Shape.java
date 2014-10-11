@@ -23,4 +23,6 @@ public interface Shape {
     public ColorRGB getSpecular();
     public void setShininess(float shininess);
     public float getShininess();
+    public void setEmission(ColorRGB emission);
+    public ColorRGB getEmission();
 }

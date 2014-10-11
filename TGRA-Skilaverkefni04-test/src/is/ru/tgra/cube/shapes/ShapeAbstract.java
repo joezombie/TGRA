@@ -15,6 +15,7 @@ public abstract class ShapeAbstract implements Shape {
     public ColorRGB diffuse;
     public ColorRGB specular;
     public float shininess;
+    public ColorRGB emission;
 
     @Override
     public void setSize(float size) {
@@ -91,5 +92,15 @@ public abstract class ShapeAbstract implements Shape {
     @Override
     public float getShininess() {
         return shininess;
+    }
+
+    @Override
+    public ColorRGB getEmission() {
+        return emission;
+    }
+
+    @Override
+    public void setEmission(ColorRGB emission) {
+        this.emission = emission;
     }
 }

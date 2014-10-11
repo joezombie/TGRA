@@ -85,14 +85,18 @@ public class CubeEngine implements ApplicationListener {
         Guy.loadVertices();
         checkPoint = new Point3D(0.0f, 0.5f, 0.0f);
         guy = new Guy(new Point3D(checkPoint), 1.0f, new ColorRGB(0, 1, 0));
+        guy.setDiffuse(new ColorRGB(0, 1, 0));
+        guy.setSpecular(new ColorRGB(0, 1, 0));
+        guy.setEmission(new ColorRGB(0, 0.4f, 0));
+        guy.setShininess(50);
         guy.setSpeed(5.0f);
 
         // -GroundCubes
         groundCubes = new ArrayList<GroundCube>();
         GroundCube.loadVertices();
-        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(8.0f, -2.0f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(16.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0,1f, 0), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0,0,0), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(8.0f, -2.0f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0,0), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(16.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0,1f, 0), new ColorRGB(0,0,0), 30.0f));
 
         for (GroundCube gc : groundCubes){
             shapes.add(gc);
@@ -102,7 +106,8 @@ public class CubeEngine implements ApplicationListener {
         Sphere sphere = new Sphere(128, 256);
         sphere.setPosition(new Point3D(6.0f, 3.0f, 0.0f));
         sphere.setDiffuse(new ColorRGB(0.01f, 0.01f, 0.5f));
-        sphere.setSpecular(new ColorRGB(0.1f, 0.1f, 5f));
+        sphere.setSpecular(new ColorRGB(0.1f, 0.1f, 0.4f));
+        sphere.setEmission(new ColorRGB(0.2f, 0.2f, 0.6f));
         sphere.setShininess(90.0f);
         shapes.add(sphere);
 
@@ -231,7 +236,9 @@ public class CubeEngine implements ApplicationListener {
         }
 
         // Move camera with guy
-        mainCamera.lookAt(Point3D.Add(guy.position, cameraOffset), guy.position, new Vector3D(0, 1, 0));
+        if(!controlCamera) {
+            mainCamera.lookAt(Point3D.Add(guy.position, cameraOffset), guy.position, new Vector3D(0, 1, 0));
+        }
         // Move light with camera
         light1.setLightPosition(new Point3D(mainCamera.eye.x, mainCamera.eye.y, mainCamera.eye.z));
 
@@ -261,12 +268,17 @@ public class CubeEngine implements ApplicationListener {
         */
         //
 
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, guy.getDiffuse().getArray(), 0);
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, guy.getSpecular().getArray(), 0);
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_EMISSION, guy.getEmission().getArray(), 0);
+        Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, guy.getShininess());
 
         guy.draw();
 
         for(Shape s : shapes){
             Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, s.getDiffuse().getArray(), 0);
             Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, s.getSpecular().getArray(), 0);
+            Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_EMISSION, s.getEmission().getArray(), 0);
             Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, s.getShininess());
             s.draw();
         }

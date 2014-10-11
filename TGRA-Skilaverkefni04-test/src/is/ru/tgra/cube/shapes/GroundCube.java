@@ -20,12 +20,13 @@ public class GroundCube extends ShapeAbstract {
         setColor(color);
     }
 
-    public GroundCube(Point3D position, float size, ColorRGB diffuse, ColorRGB specular, float shininess){
+    public GroundCube(Point3D position, float size, ColorRGB diffuse, ColorRGB specular, ColorRGB emission, float shininess){
         setPosition(position);
         setSize(size);
         setDiffuse(diffuse);
         setSpecular(specular);
         setShininess(shininess);
+        setEmission(emission);
     }
 
     public static void loadVertices()

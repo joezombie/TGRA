@@ -126,8 +126,8 @@ public class Guy extends ShapeAbstract {
         Gdx.gl11.glTranslatef(position.x, position.y, position.z);
         Gdx.gl11.glScalef(size, size, size);
 
-        float[] materialDiffuse = {color.r, color.g, color.b, 1.0f};
-        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
+        //float[] materialDiffuse = {color.r, color.g, color.b, 1.0f};
+        //Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
 
         Gdx.gl11.glNormal3f(0.0f, 0.0f, -1.0f);
         Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
