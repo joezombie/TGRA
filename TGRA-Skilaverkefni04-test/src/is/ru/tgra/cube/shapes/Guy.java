@@ -18,7 +18,6 @@ public class Guy extends ShapeAbstract {
     private Vector3D jump;
     private boolean jumping = false;
     private boolean falling = false;
-    private float jumpEndY;
     private float jumpStartTime;
     private Vector3D direction;
     private float speed;
@@ -60,14 +59,6 @@ public class Guy extends ShapeAbstract {
 
     public void setJumping(boolean jumping) {
         this.jumping = jumping;
-    }
-
-    public float getJumpEndY() {
-        return jumpEndY;
-    }
-
-    public void setJumpHeight(float height) {
-        this.jumpEndY = position.y + height;
     }
 
     public boolean isJumping(){

@@ -8,10 +8,7 @@ import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import is.ru.tgra.cube.helpers.*;
-import is.ru.tgra.cube.shapes.Box;
-import is.ru.tgra.cube.shapes.Guy;
-import is.ru.tgra.cube.shapes.Shape;
-import is.ru.tgra.cube.shapes.Sphere;
+import is.ru.tgra.cube.shapes.*;
 
 
 import java.util.ArrayList;
@@ -31,6 +28,7 @@ public class CubeEngine implements ApplicationListener {
     List<Light> lights;
     Light light1;
     List<Shape> shapes;
+    List<GroundCube> groundCubes;
     CubeLogger log = CubeLogger.getInstance();
     Guy guy;
     boolean controlCamera = false;
@@ -89,11 +87,16 @@ public class CubeEngine implements ApplicationListener {
         guy = new Guy(new Point3D(checkPoint), 1.0f, new ColorRGB(0, 1, 0));
         guy.setSpeed(5.0f);
 
-        // -Boxes
-        Box.loadVertices();
-        shapes.add(new Box(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), 30.0f));
-        shapes.add(new Box(new Point3D(6.0f, -2.0f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), 30.0f));
-        shapes.add(new Box(new Point3D(12.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0,1f, 0), 30.0f));
+        // -GroundCubes
+        groundCubes = new ArrayList<GroundCube>();
+        GroundCube.loadVertices();
+        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(8.0f, -2.0f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(16.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0,1f, 0), 30.0f));
+
+        for (GroundCube gc : groundCubes){
+            shapes.add(gc);
+        }
 
         // -Sphere
         Sphere sphere = new Sphere(128, 256);
@@ -181,17 +184,14 @@ public class CubeEngine implements ApplicationListener {
         } else {
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 guy.moveLeft(deltaTime);
-                //mainCamera.slide(-5.0f * deltaTime, 0, 0);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 guy.moveRight(deltaTime);
-                //mainCamera.slide(5.0f * deltaTime, 0, 0);
                 }
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                 if( !(guy.isJumping() || guy.isFalling()) ){
                     guy.setJumping(true);
                     guy.setJumpStartTime(runTime);
-                    //guy.setJumpHeight(3);
                 }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -199,36 +199,40 @@ public class CubeEngine implements ApplicationListener {
             }
         }
 
-        mainCamera.lookAt(Point3D.Add(guy.position, cameraOffset), guy.position, new Vector3D(0, 1, 0));
-
+        // Reset guy if he falls too far
         if(guy.getPosition().y < -6){
             reset();
         }
 
+        // Check if guy is falling
         guy.setFalling(true);
-        for(Shape s : shapes){
+        for(GroundCube gc : groundCubes){
             //log.debug("Guy=" + guy.getPosition() + " shape=" + s.getPosition());
-            if((guy.getPosition().y - 0.5) - (s.getPosition().y + 2.5) < 0.01f){
+            /*if((guy.getPosition().y - 0.5) - (s.getPosition().y + 2.5) < 0.01f){
                 if(guy.getPosition().x - 0.5 > s.getPosition().x - 2.5 && guy.getPosition().x + 1 < s.getPosition().x + 2.5){
                     guy.setFalling(false);
+                }
+            }*/
+            if(gc.collides(guy)){
+                if(gc.collidesTop(guy)) {
+                    guy.setFalling(false);
+                    guy.setPosition(new Point3D(guy.getPosition().x, gc.getPosition().y + gc.getRadius() + guy.getRadius(), guy.getPosition().z));
                 }
             }
         }
 
+        // Move guy up or down if jumping or falling
         if(guy.isJumping()){
             log.debug("Jumping Y=" + guy.getPosition().y);
             guy.updateJump(runTime, deltaTime);
-            /*
-            if(guy.getPosition().y > guy.getJumpEndY()){
-                guy.setJumping(false);
-            } else {
-                guy.getPosition().add(new Vector3D(0, 3.0f * deltaTime, 0));
-            }*/
         }else if(guy.isFalling()){
             guy.getPosition().add(new Vector3D(0, -5.0f * deltaTime, 0));
             log.debug("Falling");
         }
 
+        // Move camera with guy
+        mainCamera.lookAt(Point3D.Add(guy.position, cameraOffset), guy.position, new Vector3D(0, 1, 0));
+        // Move light with camera
         light1.setLightPosition(new Point3D(mainCamera.eye.x, mainCamera.eye.y, mainCamera.eye.z));
 
     }
