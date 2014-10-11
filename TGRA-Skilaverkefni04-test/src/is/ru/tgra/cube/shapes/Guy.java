@@ -2,6 +2,7 @@ package is.ru.tgra.cube.shapes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL11;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.BufferUtils;
 import is.ru.tgra.cube.helpers.ColorRGB;
 import is.ru.tgra.cube.helpers.Point3D;
@@ -18,12 +19,35 @@ public class Guy extends ShapeAbstract {
     private boolean jumping = false;
     private boolean falling = false;
     private float jumpEndY;
+    private float jumpStartTime;
+    private Vector3D direction;
+    private float speed;
 
     public Guy(Point3D position, float size, ColorRGB color){
         setPosition(position);
         setSize(size);
         setColor(color);
         setJump(new Vector3D(0, 3.0f, 0));
+        setDirection(new Vector3D(1.0f, 0, 0));
+        setSpeed(3.0f);
+    }
+
+    public void moveLeft(float deltaTime){
+        position.add(new Vector3D(
+                -(getDirection().x * getSpeed()) * deltaTime,
+                -(getDirection().y * getSpeed()) * deltaTime,
+                -(getDirection().z * getSpeed()) * deltaTime ));
+    }
+
+    public void moveRight(float deltaTime){
+        position.add(new Vector3D(
+                getDirection().x * getSpeed() * deltaTime,
+                getDirection().y * getSpeed() * deltaTime,
+                getDirection().z * getSpeed() * deltaTime ));
+    }
+
+    public void setJumpStartTime(float jumpStartTime) {
+        this.jumpStartTime = jumpStartTime;
     }
 
     public Vector3D getJump() {
@@ -58,6 +82,15 @@ public class Guy extends ShapeAbstract {
         this.falling = falling;
     }
 
+    public void updateJump(float runTime, float deltaTime){
+        float jumpTime = runTime - jumpStartTime;
+        if(jumpTime >= 0.5f ){
+            jumping = false;
+        } else {
+            position.add(new Vector3D(0, 4.0f * deltaTime, 0));
+        }
+    }
+
     public static void loadVertices()
     {
         vertexBuffer = BufferUtils.newFloatBuffer(72);
@@ -74,6 +107,22 @@ public class Guy extends ShapeAbstract {
                 -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,
                 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f});
         vertexBuffer.rewind();
+    }
+
+    public Vector3D getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Vector3D direction) {
+        this.direction = direction;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 
     @Override

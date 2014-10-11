@@ -11,6 +11,7 @@ import is.ru.tgra.cube.helpers.*;
 import is.ru.tgra.cube.shapes.Box;
 import is.ru.tgra.cube.shapes.Guy;
 import is.ru.tgra.cube.shapes.Shape;
+import is.ru.tgra.cube.shapes.Sphere;
 
 
 import java.util.ArrayList;
@@ -34,12 +35,14 @@ public class CubeEngine implements ApplicationListener {
     Guy guy;
     boolean controlCamera = false;
     int fps;
+    Point3D checkPoint;
+    float runTime = 0;
+    Vector3D cameraOffset;
 
     @Override
     public void create() {
         log.setDebug(true);
         log.debug("Create");
-
 
         // Set ratio
         resize(width, height);
@@ -72,25 +75,36 @@ public class CubeEngine implements ApplicationListener {
 
         // Cameras
         mainCamera = new Camera();
+        cameraOffset = new Vector3D(0, 3.0f, 10.0f);
         mainCamera.lookAt(new Point3D(0.0f, 3.0f, 11.0f), new Point3D(0.0f, 2.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f));
         //                       fov, aspect_ratio, nearPlane, farPlane
         mainCamera.perspective(90.0f, ratio, 10.0f, 100.0f);
 
         // Shapes
-        Guy.loadVertices();
-        guy = new Guy(new Point3D(0.0f, 0.5f, 0.0f), 1.0f, new ColorRGB(0, 1, 0));
-
         shapes = new ArrayList<Shape>();
 
-        // Boxes
+        // -Guy
+        Guy.loadVertices();
+        checkPoint = new Point3D(0.0f, 0.5f, 0.0f);
+        guy = new Guy(new Point3D(checkPoint), 1.0f, new ColorRGB(0, 1, 0));
+        guy.setSpeed(5.0f);
+
+        // -Boxes
         Box.loadVertices();
+        shapes.add(new Box(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), 30.0f));
+        shapes.add(new Box(new Point3D(6.0f, -2.0f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), 30.0f));
+        shapes.add(new Box(new Point3D(12.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0,1f, 0), 30.0f));
 
-        shapes.add(new Box(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0)));
-        shapes.add(new Box(new Point3D(6.0f, -2.0f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0)));
-        shapes.add(new Box(new Point3D(12.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0)));
+        // -Sphere
+        Sphere sphere = new Sphere(128, 256);
+        sphere.setPosition(new Point3D(6.0f, 3.0f, 0.0f));
+        sphere.setDiffuse(new ColorRGB(0.01f, 0.01f, 0.5f));
+        sphere.setSpecular(new ColorRGB(0.1f, 0.1f, 5f));
+        sphere.setShininess(90.0f);
+        shapes.add(sphere);
 
+        // InputProcessor
         setInputProcessor();
-
     }
 
     private void setInputProcessor(){
@@ -101,6 +115,27 @@ public class CubeEngine implements ApplicationListener {
                 switch (i){
                     case Input.Keys.C:
                         controlCamera = !controlCamera;
+                        break;
+                    case Input.Keys.F1:
+                        log.debug("F1 pressed");
+                        cameraOffset = new Vector3D(0, 3.0f, 11.0f);
+                        guy.setDirection(new Vector3D(1.0f, 0, 0));
+                        break;
+                    case Input.Keys.F2:
+                        log.debug("F2 pressed");
+                        cameraOffset = new Vector3D(11.0f, 3.0f, 0);
+                        guy.setDirection(new Vector3D(0, 0, -1.0f));
+                        break;
+                    case Input.Keys.F3:
+                        log.debug("F3 pressed");
+                        cameraOffset = new Vector3D(0, 3.0f, -11.0f);
+                        guy.setDirection(new Vector3D(-1.0f, 0, 0));
+                        break;
+                    case Input.Keys.F4:
+                        log.debug("F4 pressed");
+                        cameraOffset = new Vector3D(-11.0f, 3.0f, 0);
+                        guy.setDirection(new Vector3D(0, 0, 1.0f));
+                        break;
                 }
                 return false;
             }
@@ -112,19 +147,21 @@ public class CubeEngine implements ApplicationListener {
     private void update(){
         fps = Gdx.graphics.getFramesPerSecond();
         float deltaTime = Gdx.graphics.getDeltaTime();
+        runTime += deltaTime;
+        //log.debug("Runtime=" + runTime);
 
         if(controlCamera) {
             if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-                mainCamera.slide(0, 0, -1.0f * deltaTime);
+                mainCamera.slide(0, 0, -3.0f * deltaTime);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-                mainCamera.slide(0, 0, 1.0f * deltaTime);
+                mainCamera.slide(0, 0, 2.0f * deltaTime);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                mainCamera.slide(-1.0f * deltaTime, 0, 0);
+                mainCamera.slide(-3.0f * deltaTime, 0, 0);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                mainCamera.slide(1.0f * deltaTime, 0, 0);
+                mainCamera.slide(3.0f * deltaTime, 0, 0);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 mainCamera.yaw(30.0f * deltaTime);
@@ -133,27 +170,28 @@ public class CubeEngine implements ApplicationListener {
                 mainCamera.yaw(-30.0f * deltaTime);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                mainCamera.slide(0, 1.0f * deltaTime, 0);
+                mainCamera.slide(0, 3.0f * deltaTime, 0);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                mainCamera.slide(0, -1.0f * deltaTime, 0);
+                mainCamera.slide(0, -3.0f * deltaTime, 0);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.R)) {
                 log.debug("mainCamera eye: " + mainCamera.eye);
             }
         } else {
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                guy.getPosition().add(new Vector3D(-5.0f * deltaTime, 0, 0));
-                mainCamera.slide(-5.0f * deltaTime, 0, 0);
+                guy.moveLeft(deltaTime);
+                //mainCamera.slide(-5.0f * deltaTime, 0, 0);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                guy.getPosition().add(new Vector3D(5.0f * deltaTime, 0, 0));
-                mainCamera.slide(5.0f * deltaTime, 0, 0);
-            }
+                guy.moveRight(deltaTime);
+                //mainCamera.slide(5.0f * deltaTime, 0, 0);
+                }
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                 if( !(guy.isJumping() || guy.isFalling()) ){
                     guy.setJumping(true);
-                    guy.setJumpHeight(3);
+                    guy.setJumpStartTime(runTime);
+                    //guy.setJumpHeight(3);
                 }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -161,13 +199,15 @@ public class CubeEngine implements ApplicationListener {
             }
         }
 
+        mainCamera.lookAt(Point3D.Add(guy.position, cameraOffset), guy.position, new Vector3D(0, 1, 0));
+
         if(guy.getPosition().y < -6){
             reset();
         }
 
         guy.setFalling(true);
         for(Shape s : shapes){
-            log.debug("Guy=" + guy.getPosition() + " shape=" + s.getPosition());
+            //log.debug("Guy=" + guy.getPosition() + " shape=" + s.getPosition());
             if((guy.getPosition().y - 0.5) - (s.getPosition().y + 2.5) < 0.01f){
                 if(guy.getPosition().x - 0.5 > s.getPosition().x - 2.5 && guy.getPosition().x + 1 < s.getPosition().x + 2.5){
                     guy.setFalling(false);
@@ -177,13 +217,15 @@ public class CubeEngine implements ApplicationListener {
 
         if(guy.isJumping()){
             log.debug("Jumping Y=" + guy.getPosition().y);
+            guy.updateJump(runTime, deltaTime);
+            /*
             if(guy.getPosition().y > guy.getJumpEndY()){
                 guy.setJumping(false);
             } else {
                 guy.getPosition().add(new Vector3D(0, 3.0f * deltaTime, 0));
-            }
+            }*/
         }else if(guy.isFalling()){
-            guy.getPosition().add(new Vector3D(0, -3.0f * deltaTime, 0));
+            guy.getPosition().add(new Vector3D(0, -5.0f * deltaTime, 0));
             log.debug("Falling");
         }
 
@@ -203,7 +245,6 @@ public class CubeEngine implements ApplicationListener {
         Gdx.gl11.glLightModelfv(GL11.GL_AMBIENT, new float[]{0.2f, 0.2f, 0.2f, 1.0f}, 0);
 
 
-
         for(Light l : lights){
             Gdx.gl11.glLightfv(l.ID, GL11.GL_DIFFUSE, l.getLightDiffuse(), 0);
             Gdx.gl11.glLightfv(l.ID, GL11.GL_SPECULAR, l.getLightSpecular(), 0);
@@ -217,22 +258,16 @@ public class CubeEngine implements ApplicationListener {
         //
 
 
-
-        float[] materialDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
-        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
-
-        float[] materialSpecular = {1.0f, 1.0f, 1.0f, 1.0f};
-        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, materialSpecular, 0);
-
-        Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, 90.0f);
-
         guy.draw();
 
         for(Shape s : shapes){
+            Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, s.getDiffuse().getArray(), 0);
+            Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, s.getSpecular().getArray(), 0);
+            Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, s.getShininess());
             s.draw();
-
         }
 
+        Gdx.gl11.glDisable(GL11.GL_LIGHTING);
         fontBatch.begin();
         font.setColor(Color.WHITE);
         if(controlCamera){
@@ -242,10 +277,12 @@ public class CubeEngine implements ApplicationListener {
         }
         font.draw(fontBatch, "FPS: " + fps, 20, height - 40);
         fontBatch.end();
+        Gdx.gl11.glEnable(GL11.GL_LIGHTING);
     }
 
     public void reset(){
-        guy.setPosition(new Point3D(0, 4, 0));
+        guy.setPosition(Point3D.Add(checkPoint, new Vector3D(0, 2.0f, 0)));
+        mainCamera.lookAt(Point3D.Add(checkPoint, new Vector3D(0, 3.0f, 11.0f)), checkPoint, new Vector3D(0, 1, 0));
     }
 
     @Override

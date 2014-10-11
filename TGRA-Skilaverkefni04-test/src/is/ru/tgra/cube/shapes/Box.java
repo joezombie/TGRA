@@ -20,6 +20,14 @@ public class Box extends ShapeAbstract {
         setColor(color);
     }
 
+    public Box(Point3D position, float size, ColorRGB diffuse, ColorRGB specular, float shininess){
+        setPosition(position);
+        setSize(size);
+        setDiffuse(diffuse);
+        setSpecular(specular);
+        setShininess(shininess);
+    }
+
     public static void loadVertices()
     {
         vertexBuffer = BufferUtils.newFloatBuffer(72);
@@ -42,14 +50,14 @@ public class Box extends ShapeAbstract {
     public void draw()
     {
         Gdx.gl11.glPushMatrix();
-
+        Gdx.gl11.glShadeModel(GL11.GL_SMOOTH);
         Gdx.gl11.glVertexPointer(3, GL11.GL_FLOAT, 0, vertexBuffer);
 
         Gdx.gl11.glTranslatef(position.x, position.y, position.z);
         Gdx.gl11.glScalef(size, size, size);
 
-        float[] materialDiffuse = {color.r, color.g, color.b, 1.0f};
-        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
+        //float[] materialDiffuse = {color.r, color.g, color.b, 1.0f};
+        //Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
 
         Gdx.gl11.glNormal3f(0.0f, 0.0f, -1.0f);
         Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);

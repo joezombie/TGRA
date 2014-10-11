@@ -17,4 +17,10 @@ public interface Shape {
     public float getRadius();
     public void setRadius(float radius);
     public boolean collides(Shape shape);
+    public void setDiffuse(ColorRGB diffuse);
+    public ColorRGB getDiffuse();
+    public void setSpecular(ColorRGB specular);
+    public ColorRGB getSpecular();
+    public void setShininess(float shininess);
+    public float getShininess();
 }

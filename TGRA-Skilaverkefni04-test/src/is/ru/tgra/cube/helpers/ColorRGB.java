@@ -7,10 +7,24 @@ public class ColorRGB {
     public float r;
     public float g;
     public float b;
+    public float a;
 
     public ColorRGB(float r, float g, float b){
         this.r = r;
         this.g = g;
         this.b = b;
+        this.a = 1.0f;
     }
+
+    public ColorRGB(float r, float g, float b, float a){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = 1.0f;
+    }
+
+    public float[] getArray(){
+        return new float[]{r, g, b, a};
+    }
+
 }

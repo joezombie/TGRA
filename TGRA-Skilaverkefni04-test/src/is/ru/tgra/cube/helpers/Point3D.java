@@ -5,7 +5,11 @@ public class Point3D
 	public float x;
 	public float y;
 	public float z;
-	
+
+    public static Point3D Add(Point3D point, Vector3D vector){
+        return new Point3D(point.x + vector.x, point.y + vector.y, point.z + vector.z );
+    }
+
 	public Point3D(float xx, float yy, float zz)
 	{
 		x = xx;
@@ -33,6 +37,10 @@ public class Point3D
 		y = y + v.y;
 		z = z + v.z;
 	}
+
+    public float[] getArray(){
+        return new float[]{x, y, z};
+    }
 
     @Override
     public String toString() {

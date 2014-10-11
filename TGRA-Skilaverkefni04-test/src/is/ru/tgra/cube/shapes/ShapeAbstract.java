@@ -12,6 +12,9 @@ public abstract class ShapeAbstract implements Shape {
     public float size;
     public ColorRGB color;
     public float radius;
+    public ColorRGB diffuse;
+    public ColorRGB specular;
+    public float shininess;
 
     @Override
     public void setSize(float size) {
@@ -58,5 +61,35 @@ public abstract class ShapeAbstract implements Shape {
                 ", color=" + color +
                 ", radius=" + radius +
                 '}';
+    }
+
+    @Override
+    public void setDiffuse(ColorRGB diffuse) {
+        this.diffuse = diffuse;
+    }
+
+    @Override
+    public ColorRGB getDiffuse() {
+        return diffuse;
+    }
+
+    @Override
+    public void setSpecular(ColorRGB specular) {
+        this.specular = specular;
+    }
+
+    @Override
+    public ColorRGB getSpecular() {
+        return specular;
+    }
+
+    @Override
+    public void setShininess(float shininess) {
+        this.shininess = shininess;
+    }
+
+    @Override
+    public float getShininess() {
+        return shininess;
     }
 }
