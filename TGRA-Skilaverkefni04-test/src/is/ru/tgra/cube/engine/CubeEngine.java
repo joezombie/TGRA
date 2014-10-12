@@ -94,9 +94,12 @@ public class CubeEngine implements ApplicationListener {
         // -GroundCubes
         groundCubes = new ArrayList<GroundCube>();
         GroundCube.loadVertices();
-        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0,0,0), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(8.0f, -2.0f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0,0), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(16.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0,1f, 0), new ColorRGB(0,0,0), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(5.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(16.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0, 1f, 0), new ColorRGB(0, 0, 0), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(16.0f, -1.0f, -8.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0,1f, 0), new ColorRGB(0,0,0), 30.0f));
+
+
 
         for (GroundCube gc : groundCubes){
             shapes.add(gc);

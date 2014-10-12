@@ -2,6 +2,7 @@ package is.ru.tgra.cube.shapes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL11;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.BufferUtils;
 import is.ru.tgra.cube.helpers.ColorRGB;
@@ -15,6 +16,9 @@ import java.nio.FloatBuffer;
  */
 public class Guy extends ShapeAbstract {
     private static FloatBuffer vertexBuffer;
+    private static FloatBuffer texCoordBuffer;
+    private Texture texture;
+    private String textureFile = "assets/textures/guy.png";
     private Vector3D jump;
     private boolean jumping = false;
     private boolean falling = false;
@@ -29,6 +33,7 @@ public class Guy extends ShapeAbstract {
         setJump(new Vector3D(0, 3.0f, 0));
         setDirection(new Vector3D(1.0f, 0, 0));
         setSpeed(3.0f);
+        texture = new Texture(Gdx.files.internal(textureFile));
     }
 
     public void moveLeft(float deltaTime){
@@ -98,6 +103,15 @@ public class Guy extends ShapeAbstract {
                 -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,
                 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f});
         vertexBuffer.rewind();
+
+        texCoordBuffer = BufferUtils.newFloatBuffer(48);
+        texCoordBuffer.put(new float[] {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f});
+        texCoordBuffer.rewind();
     }
 
     public Vector3D getDirection() {
@@ -126,6 +140,13 @@ public class Guy extends ShapeAbstract {
         Gdx.gl11.glTranslatef(position.x, position.y, position.z);
         Gdx.gl11.glScalef(size, size, size);
 
+        Gdx.gl11.glEnable(GL11.GL_TEXTURE_2D);
+        Gdx.gl11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+        texture.bind();  //Gdx.gl11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
+
+        Gdx.gl11.glTexCoordPointer(2, GL11.GL_FLOAT, 0, texCoordBuffer);
+
         //float[] materialDiffuse = {color.r, color.g, color.b, 1.0f};
         //Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
 
@@ -141,6 +162,9 @@ public class Guy extends ShapeAbstract {
         Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 16, 4);
         Gdx.gl11.glNormal3f(0.0f, -1.0f, 0.0f);
         Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 20, 4);
+
+        Gdx.gl11.glDisable(GL11.GL_TEXTURE_2D);
+        Gdx.gl11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 
         Gdx.gl11.glPopMatrix();
     }

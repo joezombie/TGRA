@@ -2,6 +2,7 @@ package is.ru.tgra.cube.shapes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL11;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.BufferUtils;
 import is.ru.tgra.cube.helpers.ColorRGB;
 import is.ru.tgra.cube.helpers.Point3D;
@@ -13,12 +14,9 @@ import java.nio.FloatBuffer;
  */
 public class GroundCube extends ShapeAbstract {
     private static FloatBuffer vertexBuffer;
-
-    public GroundCube(Point3D position, float size, ColorRGB color){
-        setPosition(position);
-        setSize(size);
-        setColor(color);
-    }
+    private static FloatBuffer texCoordBuffer;
+    private Texture texture;
+    private String textureFile = "assets/textures/obsidian.png";
 
     public GroundCube(Point3D position, float size, ColorRGB diffuse, ColorRGB specular, ColorRGB emission, float shininess){
         setPosition(position);
@@ -27,6 +25,7 @@ public class GroundCube extends ShapeAbstract {
         setSpecular(specular);
         setShininess(shininess);
         setEmission(emission);
+        texture = new Texture(Gdx.files.internal(textureFile));
     }
 
     public static void loadVertices()
@@ -45,6 +44,23 @@ public class GroundCube extends ShapeAbstract {
                 -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f,
                 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f});
         vertexBuffer.rewind();
+
+        texCoordBuffer = BufferUtils.newFloatBuffer(48);
+        texCoordBuffer.put(new float[] {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f});
+        texCoordBuffer.rewind();
+    }
+
+    public String getTextureFile() {
+        return textureFile;
+    }
+
+    public void setTextureFile(String textureFile) {
+        this.textureFile = textureFile;
     }
 
     @Override
@@ -56,6 +72,13 @@ public class GroundCube extends ShapeAbstract {
 
         Gdx.gl11.glTranslatef(position.x, position.y, position.z);
         Gdx.gl11.glScalef(size, size, size);
+
+        Gdx.gl11.glEnable(GL11.GL_TEXTURE_2D);
+        Gdx.gl11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+        texture.bind();  //Gdx.gl11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
+
+        Gdx.gl11.glTexCoordPointer(2, GL11.GL_FLOAT, 0, texCoordBuffer);
 
         //float[] materialDiffuse = {color.r, color.g, color.b, 1.0f};
         //Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, materialDiffuse, 0);
@@ -72,6 +95,9 @@ public class GroundCube extends ShapeAbstract {
         Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 16, 4);
         Gdx.gl11.glNormal3f(0.0f, -1.0f, 0.0f);
         Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 20, 4);
+
+        Gdx.gl11.glDisable(GL11.GL_TEXTURE_2D);
+        Gdx.gl11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 
         Gdx.gl11.glPopMatrix();
     }
