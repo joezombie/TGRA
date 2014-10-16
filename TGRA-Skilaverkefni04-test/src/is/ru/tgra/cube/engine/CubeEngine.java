@@ -49,7 +49,7 @@ public class CubeEngine implements ApplicationListener {
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
         Gdx.gl11.glEnable(GL11.GL_DEPTH_TEST);
         Gdx.gl11.glEnable(GL11.GL_NORMALIZE);
-        Gdx.gl11.glClearColor(0.2f, 0.0f, 0.1f, 1.0f);
+        Gdx.gl11.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         Gdx.gl11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
 
         // Font
@@ -94,10 +94,11 @@ public class CubeEngine implements ApplicationListener {
         // -GroundCubes
         groundCubes = new ArrayList<GroundCube>();
         GroundCube.loadVertices();
-        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(5.0f, -2.5f, 0.0f), 5.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(16.0f, -1.0f, 0.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0, 1f, 0), new ColorRGB(0, 0, 0), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(16.0f, -1.0f, -8.0f), 5.0f, new ColorRGB(0.5f, 0.2f, 0), new ColorRGB(0.2f, 0,1f, 0), new ColorRGB(0,0,0), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(4.0f, -2.5f, 0.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, 0.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, -5.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
+        groundCubes.add(new GroundCube(new Point3D(15.0f, 0, -5.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
 
 
 
@@ -107,11 +108,12 @@ public class CubeEngine implements ApplicationListener {
 
         // -Sphere
         Sphere sphere = new Sphere(128, 256);
-        sphere.setPosition(new Point3D(6.0f, 3.0f, 0.0f));
-        sphere.setDiffuse(new ColorRGB(0.01f, 0.01f, 0.5f));
-        sphere.setSpecular(new ColorRGB(0.1f, 0.1f, 0.4f));
-        sphere.setEmission(new ColorRGB(0.2f, 0.2f, 0.6f));
+        sphere.setPosition(new Point3D(4.0f, 0.5f, 0.0f));
+        sphere.setDiffuse(new ColorRGB(0.2f, 0.2f, 0.8f));
+        sphere.setSpecular(new ColorRGB(0.2f, 0.2f, 0.8f));
+        sphere.setEmission(new ColorRGB(0.02f, 0.02f, 0.08f));
         sphere.setShininess(90.0f);
+        sphere.setSize(0.8f);
         shapes.add(sphere);
 
         // InputProcessor
