@@ -10,7 +10,6 @@ import is.ru.tgra.cube.helpers.Point3D;
 public abstract class ShapeAbstract implements Shape {
     public Point3D position;
     public float size;
-    public ColorRGB color;
     public float radius;
     public ColorRGB diffuse;
     public ColorRGB specular;
@@ -28,10 +27,6 @@ public abstract class ShapeAbstract implements Shape {
         this.position = position;
     }
 
-    @Override
-    public void setColor(ColorRGB color) {
-        this.color = color;
-    }
 
     @Override
     public float getSize() {
@@ -44,25 +39,10 @@ public abstract class ShapeAbstract implements Shape {
     }
 
     @Override
-    public ColorRGB getColor() {
-        return color;
-    }
-
-    @Override
-    public float getRadius(){ return radius; };
+    public float getRadius(){ return radius; }
 
     @Override
     public void setRadius(float radius) {this.radius = radius;}
-
-    @Override
-    public String toString() {
-        return "ShapeAbstract{" +
-                "position=" + position +
-                ", size=" + size +
-                ", color=" + color +
-                ", radius=" + radius +
-                '}';
-    }
 
     @Override
     public void setDiffuse(ColorRGB diffuse) {
@@ -102,5 +82,18 @@ public abstract class ShapeAbstract implements Shape {
     @Override
     public void setEmission(ColorRGB emission) {
         this.emission = emission;
+    }
+
+    @Override
+    public String toString() {
+        return "ShapeAbstract{" +
+                "position=" + position +
+                ", size=" + size +
+                ", radius=" + radius +
+                ", diffuse=" + diffuse +
+                ", specular=" + specular +
+                ", shininess=" + shininess +
+                ", emission=" + emission +
+                '}';
     }
 }

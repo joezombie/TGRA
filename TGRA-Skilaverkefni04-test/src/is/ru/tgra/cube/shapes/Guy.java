@@ -20,16 +20,26 @@ public class Guy extends ShapeAbstract {
     private Texture texture;
     private String textureFile = "assets/textures/guy.png";
     private Vector3D jump;
+    private boolean dying;
+    private boolean dyingDone;
+    private float dieStartTime;
+    private float dieEndTime;
+    private float originalSize;
     private boolean jumping = false;
-    private boolean falling = false;
     private float jumpStartTime;
+    private float jumpEndTime;
+    private boolean falling = false;
+    private float fallStartTime;
+    private float fallAccelerationEndTime;
     private Vector3D direction;
+    private Point3D lastPosition;
     private float speed;
 
     public Guy(Point3D position, float size, ColorRGB color){
         setPosition(position);
+        setLastPosition(position);
         setSize(size);
-        setColor(color);
+        setDiffuse(color);
         setJump(new Vector3D(0, 3.0f, 0));
         setDirection(new Vector3D(1.0f, 0, 0));
         setSpeed(3.0f);
@@ -37,6 +47,7 @@ public class Guy extends ShapeAbstract {
     }
 
     public void moveLeft(float deltaTime){
+        setLastPosition(position);
         position.add(new Vector3D(
                 -(getDirection().x * getSpeed()) * deltaTime,
                 -(getDirection().y * getSpeed()) * deltaTime,
@@ -44,10 +55,19 @@ public class Guy extends ShapeAbstract {
     }
 
     public void moveRight(float deltaTime){
+        setLastPosition(position);
         position.add(new Vector3D(
                 getDirection().x * getSpeed() * deltaTime,
                 getDirection().y * getSpeed() * deltaTime,
                 getDirection().z * getSpeed() * deltaTime ));
+    }
+
+    public void moveBack(){
+        position = new Point3D(lastPosition);
+    }
+
+    public void setOriginalSize(float originalSize) {
+        this.originalSize = originalSize;
     }
 
     public void setJumpStartTime(float jumpStartTime) {
@@ -56,6 +76,14 @@ public class Guy extends ShapeAbstract {
 
     public Vector3D getJump() {
         return jump;
+    }
+
+    public Point3D getLastPosition() {
+        return lastPosition;
+    }
+
+    public void setLastPosition(Point3D lastPosition) {
+        this.lastPosition = new Point3D(lastPosition);
     }
 
     public void setJump(Vector3D jump) {
@@ -78,13 +106,85 @@ public class Guy extends ShapeAbstract {
         this.falling = falling;
     }
 
-    public void updateJump(float runTime, float deltaTime){
+    public void startJump(float startTime){
+        this.jumping = true;
+        this.jumpStartTime = startTime;
+        this.jumpEndTime = startTime + 0.5f;
+    }
+
+    public void updateJump(float runTime){
+        if(runTime < jumpEndTime) {
+            float t = 1 - (runTime - jumpStartTime) / (jumpEndTime - jumpStartTime);
+            position.y += t * 0.3f;
+        }
+        else {
+            this.jumping = false;
+        }
+        /*
         float jumpTime = runTime - jumpStartTime;
         if(jumpTime >= 0.5f ){
             jumping = false;
         } else {
             position.add(new Vector3D(0, 4.0f * deltaTime, 0));
         }
+        */
+    }
+
+    public void startFall(float runTime){
+        if(!falling) {
+            this.falling = true;
+            this.fallStartTime = runTime;
+            this.fallAccelerationEndTime = runTime + 3f;
+        }
+    }
+
+    public void stopFall(){
+        this.falling = false;
+    }
+
+    public void updateFall(float runTime, float deltaTime){
+        //position.y -= 15.0f * deltaTime;
+        if(runTime < fallAccelerationEndTime) {
+            float t = (runTime - fallStartTime) / (fallAccelerationEndTime - fallStartTime);
+            position.y -= t * 0.7f;
+        }
+        else {
+            position.y -= 1.0f * deltaTime;
+        }
+    }
+
+    public void startDying(float runTime){
+        this.originalSize = this.size;
+        this.dying = true;
+        this.dyingDone = false;
+        this.dieStartTime = runTime;
+        this.dieEndTime = runTime + 1.0f;
+    }
+
+    public void updateDying(float runTime){
+        if(runTime < dieEndTime){
+            float t = 1 - (runTime - dieStartTime) / (dieEndTime - dieStartTime);
+            this.size = this.size * t;
+        } else {
+            this.dyingDone = true;
+        }
+    }
+
+    public void stopDying(){
+        this.dying = false;
+        this.size = originalSize;
+    }
+
+    public boolean isDyingDone() {
+        return dyingDone;
+    }
+
+    public float getDieEndTime() {
+        return dieEndTime;
+    }
+
+    public boolean isDying() {
+        return dying;
     }
 
     public static void loadVertices()
@@ -128,6 +228,22 @@ public class Guy extends ShapeAbstract {
 
     public void setSpeed(float speed) {
         this.speed = speed;
+    }
+
+    public float getJumpStartTime() {
+        return jumpStartTime;
+    }
+
+    public float getJumpEndTime() {
+        return jumpEndTime;
+    }
+
+    public float getFallStartTime() {
+        return fallStartTime;
+    }
+
+    public float getFallAccelerationEndTime() {
+        return fallAccelerationEndTime;
     }
 
     @Override

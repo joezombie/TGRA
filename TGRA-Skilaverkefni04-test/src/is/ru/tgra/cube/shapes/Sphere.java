@@ -52,7 +52,7 @@ public class Sphere extends ShapeAbstract
 	public void draw() {
         Gdx.gl11.glTranslatef(position.x, position.y, position.z);
         Gdx.gl11.glScalef(size, size, size);
-		//Gdx.gl11.glShadeModel(GL11.GL_SMOOTH);
+		Gdx.gl11.glShadeModel(GL11.GL_SMOOTH);
 		Gdx.gl11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
 		Gdx.gl11.glVertexPointer(3, GL11.GL_FLOAT, 0, vertexBuffer);
 		Gdx.gl11.glNormalPointer(GL11.GL_FLOAT, 0, normalBuffer);

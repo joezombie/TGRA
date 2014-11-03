@@ -11,8 +11,6 @@ public interface Shape {
     public float getSize();
     public void setPosition(Point3D point);
     public Point3D getPosition();
-    public void setColor(ColorRGB color);
-    public ColorRGB getColor();
     public void draw();
     public float getRadius();
     public void setRadius(float radius);

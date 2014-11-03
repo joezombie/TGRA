@@ -12,20 +12,86 @@ import java.nio.FloatBuffer;
 /**
  * Created by Johannes Gunnar Heidarsson on 11.10.2014.
  */
-public class GroundCube extends ShapeAbstract {
+public class GroundCube{
     private static FloatBuffer vertexBuffer;
     private static FloatBuffer texCoordBuffer;
-    private Texture texture;
-    private String textureFile = "assets/textures/obsidian.png";
+    private static float size;
+    private static float radius;
+    private static ColorRGB diffuse;
+    private static ColorRGB specular;
+    private static float shininess;
+    private static ColorRGB emission;
+    private static Texture texture;
+    private static String textureFile = "assets/textures/obsidian.png";
+    private Point3D position;
 
-    public GroundCube(Point3D position, float size, ColorRGB diffuse, ColorRGB specular, ColorRGB emission, float shininess){
+    public GroundCube(Point3D position){
         setPosition(position);
-        setSize(size);
-        setDiffuse(diffuse);
-        setSpecular(specular);
-        setShininess(shininess);
-        setEmission(emission);
-        texture = new Texture(Gdx.files.internal(textureFile));
+    }
+
+    public Point3D getPosition() {
+        return position;
+    }
+
+    public void setPosition(Point3D position) {
+        this.position = position;
+    }
+
+    public static float getSize() {
+        return size;
+    }
+
+    public static void setSize(float size) {
+        GroundCube.size = size;
+        setRadius(size / 2);
+    }
+
+    public static float getRadius() {
+        return radius;
+    }
+
+    public static void setRadius(float radius) {
+        GroundCube.radius = radius;
+    }
+
+    public static ColorRGB getDiffuse() {
+        return diffuse;
+    }
+
+    public static void setDiffuse(ColorRGB diffuse) {
+        GroundCube.diffuse = diffuse;
+    }
+
+    public static ColorRGB getSpecular() {
+        return specular;
+    }
+
+    public static void setSpecular(ColorRGB specular) {
+        GroundCube.specular = specular;
+    }
+
+    public static float getShininess() {
+        return shininess;
+    }
+
+    public static void setShininess(float shininess) {
+        GroundCube.shininess = shininess;
+    }
+
+    public static ColorRGB getEmission() {
+        return emission;
+    }
+
+    public static void setEmission(ColorRGB emission) {
+        GroundCube.emission = emission;
+    }
+
+    public static Texture getTexture() {
+        return texture;
+    }
+
+    public static void setTexture(Texture texture) {
+        GroundCube.texture = texture;
     }
 
     public static void loadVertices()
@@ -45,6 +111,8 @@ public class GroundCube extends ShapeAbstract {
                 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f});
         vertexBuffer.rewind();
 
+        setTexture(new Texture(Gdx.files.internal(textureFile)));
+
         texCoordBuffer = BufferUtils.newFloatBuffer(48);
         texCoordBuffer.put(new float[] {0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
                 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
@@ -55,15 +123,14 @@ public class GroundCube extends ShapeAbstract {
         texCoordBuffer.rewind();
     }
 
-    public String getTextureFile() {
+    public static String getTextureFile() {
         return textureFile;
     }
 
-    public void setTextureFile(String textureFile) {
-        this.textureFile = textureFile;
+    public static void setTextureFile(String textureFile) {
+        GroundCube.textureFile = textureFile;
     }
 
-    @Override
     public void draw()
     {
         Gdx.gl11.glPushMatrix();
@@ -71,7 +138,7 @@ public class GroundCube extends ShapeAbstract {
         Gdx.gl11.glVertexPointer(3, GL11.GL_FLOAT, 0, vertexBuffer);
 
         Gdx.gl11.glTranslatef(position.x, position.y, position.z);
-        Gdx.gl11.glScalef(size, size, size);
+        Gdx.gl11.glScalef(getSize(), getSize(), getSize());
 
         Gdx.gl11.glEnable(GL11.GL_TEXTURE_2D);
         Gdx.gl11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
@@ -102,9 +169,8 @@ public class GroundCube extends ShapeAbstract {
         Gdx.gl11.glPopMatrix();
     }
 
-    @Override
     public boolean collides(Shape shape){
-        float halfSide = (1f * size)/2;
+        float halfSide = (1f * GroundCube.getSize())/2;
         float xNear = position.x - halfSide;
         float zNear = position.z - halfSide;
         float yNear = position.y - halfSide;
@@ -124,11 +190,10 @@ public class GroundCube extends ShapeAbstract {
     }
 
     public boolean collidesTop(Shape shape){
-        float halfSide = (1f * size)/2;
-        float top = position.y + halfSide;
+        float top = position.y + radius;
         float shapeBottom = shape.getPosition().y - getRadius();
 
-        if(shapeBottom <= top){
+        if(shapeBottom <= top && shapeBottom > top - 1f){
             return true;
         }
         return false;

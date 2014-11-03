@@ -17,7 +17,7 @@ public class Box extends ShapeAbstract {
     public Box(Point3D position, float size, ColorRGB color){
         setPosition(position);
         setSize(size);
-        setColor(color);
+        setDiffuse(color);
     }
 
     public Box(Point3D position, float size, ColorRGB diffuse, ColorRGB specular, float shininess){

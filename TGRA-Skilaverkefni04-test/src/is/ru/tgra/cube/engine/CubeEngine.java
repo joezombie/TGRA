@@ -19,8 +19,8 @@ import java.util.List;
  */
 public class CubeEngine implements ApplicationListener {
     final int[] glLight = new int[] {GL11.GL_LIGHT0, GL11.GL_LIGHT1, GL11.GL_LIGHT2, GL11.GL_LIGHT3, GL11.GL_LIGHT4, GL11.GL_LIGHT5, GL11.GL_LIGHT6, GL11.GL_LIGHT7};
-    private SpriteBatch fontBatch;
-    private BitmapFont font;
+    SpriteBatch fontBatch;
+    BitmapFont font;
     Integer width = 1024;
     Integer height = 768;
     float ratio;
@@ -29,6 +29,8 @@ public class CubeEngine implements ApplicationListener {
     Light light1;
     List<Shape> shapes;
     List<GroundCube> groundCubes;
+    List<Shape> enemies;
+    SkyBox skyBox;
     CubeLogger log = CubeLogger.getInstance();
     Guy guy;
     boolean controlCamera = false;
@@ -63,7 +65,7 @@ public class CubeEngine implements ApplicationListener {
         light1 = new Light(GL11.GL_LIGHT0);
         light1.setLightPosition(new Point3D(0.0f, 3.0f, 11.0f));
         light1.setLightDiffuse(new ColorRGB(1.0f, 1.0f, 1.0f));
-        light1.setLightSpecular(new ColorRGB(0.0f, 0.0f, 0.0f));
+        light1.setLightSpecular(new ColorRGB(1.0f, 1.0f, 1.0f));
         lights.add(light1);
 
         for(int i = 0; i < lights.size() && i < glLight.length; i++){
@@ -81,10 +83,14 @@ public class CubeEngine implements ApplicationListener {
         // Shapes
         shapes = new ArrayList<Shape>();
 
+        // -Skybox
+        SkyBox.loadVertices();
+        skyBox = new SkyBox(new Point3D(0,0,0), 110);
+
         // -Guy
         Guy.loadVertices();
         checkPoint = new Point3D(0.0f, 0.5f, 0.0f);
-        guy = new Guy(new Point3D(checkPoint), 1.0f, new ColorRGB(0, 1, 0));
+        guy = new Guy(new Point3D(checkPoint), 0.5f, new ColorRGB(0, 1, 0));
         guy.setDiffuse(new ColorRGB(0, 1, 0));
         guy.setSpecular(new ColorRGB(0, 1, 0));
         guy.setEmission(new ColorRGB(0, 0.4f, 0));
@@ -94,27 +100,30 @@ public class CubeEngine implements ApplicationListener {
         // -GroundCubes
         groundCubes = new ArrayList<GroundCube>();
         GroundCube.loadVertices();
-        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(4.0f, -2.5f, 0.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, 0.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, -5.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
-        groundCubes.add(new GroundCube(new Point3D(15.0f, 0, -5.0f), 4.0f, new ColorRGB(1.0f, 0, 0), new ColorRGB(0.2f, 0, 0), new ColorRGB(0.2f,0.2f,0.2f), 30.0f));
+        GroundCube.setSize(2f);
+        GroundCube.setDiffuse(new ColorRGB(1.0f, 1.0f, 1.0f));
+        GroundCube.setEmission(new ColorRGB());
+        GroundCube.setSpecular(new ColorRGB());
+        GroundCube.setShininess(0);
 
+        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f)));
+        groundCubes.add(new GroundCube(new Point3D(4.0f, -2.5f, 0.0f)));
+        groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, 0.0f)));
+        groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, -5.0f)));
+        groundCubes.add(new GroundCube(new Point3D(15.0f, 0, -5.0f)));
 
-
-        for (GroundCube gc : groundCubes){
-            shapes.add(gc);
-        }
-
+        // Enemies
+        this.enemies = new ArrayList<Shape>();
         // -Sphere
-        Sphere sphere = new Sphere(128, 256);
+        Sphere sphere = new Sphere(64, 128);
         sphere.setPosition(new Point3D(4.0f, 0.5f, 0.0f));
-        sphere.setDiffuse(new ColorRGB(0.2f, 0.2f, 0.8f));
-        sphere.setSpecular(new ColorRGB(0.2f, 0.2f, 0.8f));
-        sphere.setEmission(new ColorRGB(0.02f, 0.02f, 0.08f));
+        sphere.setDiffuse(new ColorRGB(1f, 1f, 1f));
+        sphere.setSpecular(new ColorRGB(1f, 0f, 0f));
+        sphere.setEmission(new ColorRGB(0.5f, 0f, 0f));
         sphere.setShininess(90.0f);
-        sphere.setSize(0.8f);
+        sphere.setSize(0.4f);
         shapes.add(sphere);
+        enemies.add(sphere);
 
         // InputProcessor
         setInputProcessor();
@@ -201,32 +210,44 @@ public class CubeEngine implements ApplicationListener {
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                 if( !(guy.isJumping() || guy.isFalling()) ){
                     guy.setJumping(true);
-                    guy.setJumpStartTime(runTime);
+                    guy.startJump(runTime);
                 }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            }
+        }
 
+        for(Shape s : enemies){
+            if(s.collides(guy)){
+                reset();
             }
         }
 
         // Reset guy if he falls too far
-        if(guy.getPosition().y < -6){
-            reset();
+        if(guy.getPosition().y < -20){
+            if(!guy.isDying()) {
+                guy.setFalling(false);
+                guy.startDying(runTime);
+            }
         }
 
         // Check if guy is falling
-        guy.setFalling(true);
-        for(GroundCube gc : groundCubes){
-            //log.debug("Guy=" + guy.getPosition() + " shape=" + s.getPosition());
+        if(!guy.isFalling() || !guy.isDying()) {
+            guy.startFall(runTime);
+            for (GroundCube gc : groundCubes) {
+                //log.debug("Guy=" + guy.getPosition() + " shape=" + s.getPosition());
             /*if((guy.getPosition().y - 0.5) - (s.getPosition().y + 2.5) < 0.01f){
                 if(guy.getPosition().x - 0.5 > s.getPosition().x - 2.5 && guy.getPosition().x + 1 < s.getPosition().x + 2.5){
                     guy.setFalling(false);
                 }
             }*/
-            if(gc.collides(guy)){
-                if(gc.collidesTop(guy)) {
-                    guy.setFalling(false);
-                    guy.setPosition(new Point3D(guy.getPosition().x, gc.getPosition().y + gc.getRadius() + guy.getRadius(), guy.getPosition().z));
+                if (gc.collides(guy)) {
+                    if (gc.collidesTop(guy)) {
+                        guy.stopFall();
+                        guy.setPosition(new Point3D(guy.getPosition().x, gc.getPosition().y + GroundCube.getRadius() + guy.getRadius(), guy.getPosition().z));
+                    } else {
+                        guy.moveBack();
+                    }
                 }
             }
         }
@@ -234,10 +255,20 @@ public class CubeEngine implements ApplicationListener {
         // Move guy up or down if jumping or falling
         if(guy.isJumping()){
             log.debug("Jumping Y=" + guy.getPosition().y);
-            guy.updateJump(runTime, deltaTime);
+            guy.updateJump(runTime);
         }else if(guy.isFalling()){
-            guy.getPosition().add(new Vector3D(0, -5.0f * deltaTime, 0));
-            log.debug("Falling");
+            //guy.getPosition().add(new Vector3D(0, -15.0f * deltaTime, 0));
+            log.debug("Falling start:" + guy.getFallStartTime() + " End:" + guy.getFallAccelerationEndTime());
+            guy.updateFall(runTime, deltaTime);
+        }
+
+        if(guy.isDying()){
+            if(guy.isDyingDone()){
+                guy.stopDying();
+                reset();
+            } else {
+                guy.updateDying(runTime);
+            }
         }
 
         // Move camera with guy
@@ -273,12 +304,25 @@ public class CubeEngine implements ApplicationListener {
         */
         //
 
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, skyBox.getDiffuse().getArray(), 0);
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, skyBox.getSpecular().getArray(), 0);
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_EMISSION, skyBox.getEmission().getArray(), 0);
+        Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, skyBox.getShininess());
+        skyBox.draw();
+
         Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, guy.getDiffuse().getArray(), 0);
         Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, guy.getSpecular().getArray(), 0);
         Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_EMISSION, guy.getEmission().getArray(), 0);
         Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, guy.getShininess());
-
         guy.draw();
+
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, GroundCube.getDiffuse().getArray(), 0);
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_SPECULAR, GroundCube.getSpecular().getArray(), 0);
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_EMISSION, GroundCube.getEmission().getArray(), 0);
+        Gdx.gl11.glMaterialf(GL11.GL_FRONT, GL11.GL_SHININESS, GroundCube.getShininess());
+        for(GroundCube gc : groundCubes){
+            gc.draw();
+        }
 
         for(Shape s : shapes){
             Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, s.getDiffuse().getArray(), 0);
@@ -302,6 +346,8 @@ public class CubeEngine implements ApplicationListener {
     }
 
     public void reset(){
+        guy.stopFall();
+        guy.startFall(runTime);
         guy.setPosition(Point3D.Add(checkPoint, new Vector3D(0, 2.0f, 0)));
         mainCamera.lookAt(Point3D.Add(checkPoint, new Vector3D(0, 3.0f, 11.0f)), checkPoint, new Vector3D(0, 1, 0));
     }

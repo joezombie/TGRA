@@ -9,6 +9,13 @@ public class ColorRGB {
     public float b;
     public float a;
 
+    public ColorRGB(){
+        this.r = 0;
+        this.g = 0;
+        this.g = 0;
+        this.a = 0;
+    }
+
     public ColorRGB(float r, float g, float b){
         this.r = r;
         this.g = g;
