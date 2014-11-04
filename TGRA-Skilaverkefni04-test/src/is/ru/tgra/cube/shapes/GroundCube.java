@@ -30,6 +30,7 @@ public class GroundCube{
     private Point3D startPosition;
     private Point3D endPosition;
     private Vector3D movement;
+    private boolean cornerCube;
 
     public GroundCube(Point3D position){
         setPosition(position);
@@ -41,6 +42,10 @@ public class GroundCube{
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.movement = movement;
+    }
+
+    public boolean isCornerCube() {
+        return cornerCube;
     }
 
     public Point3D getPosition() {

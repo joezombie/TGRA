@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL11;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.BufferUtils;
 import is.ru.tgra.cube.helpers.Point3D;
 import is.ru.tgra.cube.shapes.Shape;
@@ -17,7 +18,7 @@ public class Sphere extends ShapeAbstract
 	private FloatBuffer normalBuffer;
 	private int vertexCount;
 	private boolean drawLines = false;
-    private boolean moving;
+    private boolean moving = false;
     private Point3D P1;
     private Point3D P2;
     private Point3D P3;
@@ -63,6 +64,7 @@ public class Sphere extends ShapeAbstract
     }
 
     public void setMovement(Point3D P1, Point3D P2, Point3D P3, Point3D P4){
+        this.position = new Point3D(P1);
         this.P1 = P1;
         this.P2 = P2;
         this.P3 = P3;
@@ -95,12 +97,14 @@ public class Sphere extends ShapeAbstract
                     + 3 * (1.0f - t) * t * t * P3.z
                     + t * t * t * P4.z;
         } else {
+            position = new Point3D(P4);
             setMovement(P4, P3, P2, P1);
             startMovement(runTime, duration);
         }
     }
 
     public void draw() {
+        Gdx.gl11.glPushMatrix();
         Gdx.gl11.glTranslatef(position.x, position.y, position.z);
         Gdx.gl11.glScalef(size, size, size);
 		Gdx.gl11.glShadeModel(GL11.GL_SMOOTH);
@@ -114,11 +118,17 @@ public class Sphere extends ShapeAbstract
 				Gdx.gl11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, i, (slices+1)*2);
 		}
         Gdx.gl11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
+        Gdx.gl11.glPopMatrix();
 	}
 	
 	public void toggleDrawLines(){
 		this.drawLines = this.drawLines ? false : true;
 	}
+
+    @Override
+    public void setSize(float size) {
+        super.setSize(size / 2);
+    }
 
     @Override
     public boolean collides(Shape shape) {

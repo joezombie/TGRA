@@ -77,7 +77,7 @@ public class CubeEngine implements ApplicationListener {
 
         // -Guy
         Guy.loadVertices();
-        checkPoint = new Point3D(0.0f, 0.5f, 0.0f);
+        checkPoint = new Point3D(-12.0f, 0.5f, 0.0f);
         guy = new Guy(new Point3D(checkPoint), 0.7f, new ColorRGB(0, 1, 0));
         guy.setDiffuse(new ColorRGB(1.0f, 1.0f, 1.0f));
         guy.setSpecular(new ColorRGB(0, 0, 0));
@@ -94,33 +94,32 @@ public class CubeEngine implements ApplicationListener {
         GroundCube.setSpecular(new ColorRGB());
         GroundCube.setShininess(0);
 
-        groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f)));
-        groundCubes.add(new GroundCube(new Point3D(3.0f, -2.5f, 0.0f), new Point3D(7.0f, -2.5f, 0.0f), new Vector3D(3.0f, 0.0f, 0.0f)));
-        groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, 0.0f)));
-        groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, -5.0f)));
-        groundCubes.add(new GroundCube(new Point3D(15.0f, 0, -5.0f)));
+        groundCubes.add(new GroundCube(new Point3D(-12.0f, -2.5f, 0.0f)));
+        groundCubes.add(new GroundCube(new Point3D(-9.0f, -2.5f, 0.0f), new Point3D(-3.0f, -2.5f, 0.0f), new Vector3D(2.0f, 0.0f, 0.0f)));
+        groundCubes.add(new GroundCube(new Point3D(0.0f, -1.0f, 0.0f)));
+        groundCubes.add(new GroundCube(new Point3D(0.0f, -1.0f, -5.0f)));
+        groundCubes.add(new GroundCube(new Point3D(0.0f, 3, -10.0f)));
 
         // Enemies
         this.enemies = new ArrayList<Shape>();
         // -Sphere
         sphere = new Sphere(64, 128);
-        sphere.setPosition(new Point3D(6.0f, 0.5f, 0.0f));
-        sphere.setMovement(new Point3D(5.0f, 2.0f, -2.0f), new Point3D(2.0f, -2.0f, -2.0f), new Point3D(8.0f, -2.0f, 2.0f), new Point3D(9.0f, 2.0f, 2.0f));
-        sphere.setDiffuse(new ColorRGB(1f, 1f, 1f));
-        sphere.setSpecular(new ColorRGB(1f, 0f, 0f));
+        sphere.setMovement(new Point3D(-5.0f, 2.0f, -1.0f), new Point3D(-4.0f, -2.0f, -0.5f), new Point3D(-3.0f, -2.0f, 0.5f), new Point3D(-2.0f, 2.0f, 1.0f));
+        sphere.setDiffuse(new ColorRGB(0.8f, 0f, 0f));
+        sphere.setSpecular(new ColorRGB(0.4f, 0f, 0f));
         sphere.setEmission(new ColorRGB(0.5f, 0f, 0f));
-        sphere.setShininess(90.0f);
-        sphere.setSize(0.4f);
+        sphere.setShininess(20.0f);
+        sphere.setSize(1.0f);
         shapes.add(sphere);
         enemies.add(sphere);
 
         Sphere sphere1 = new Sphere(64, 128);
-        sphere1.setPosition(new Point3D(4.0f, 0.2f, 0.0f));
+        sphere1.setPosition(new Point3D(-8.0f, 0.2f, 0.0f));
         sphere1.setDiffuse(new ColorRGB(0.2f, 0.2f, 0.5f));
         sphere1.setSpecular(new ColorRGB());
         sphere1.setEmission(new ColorRGB());
         sphere1.setShininess(0);
-        sphere1.setSize(0.5f);
+        sphere1.setSize(1.0f);
         shapes.add(sphere1);
         enemies.add(sphere1);
 
@@ -136,8 +135,8 @@ public class CubeEngine implements ApplicationListener {
 
         sphereLight = new Light(GL11.GL_LIGHT1);
         sphereLight.setLightPosition(sphere.getPosition());
-        sphereLight.setLightDiffuse(new ColorRGB(1.0f, 0, 0));
-        sphereLight.setLightSpecular(new ColorRGB(1.0f, 0, 0));
+        sphereLight.setLightDiffuse(new ColorRGB(0.5f, 0, 0));
+        sphereLight.setLightSpecular(new ColorRGB(0.2f, 0, 0));
         lights.add(sphereLight);
 
         for(int i = 0; i < lights.size() && i < glLight.length; i++){
@@ -258,16 +257,9 @@ public class CubeEngine implements ApplicationListener {
         }
 
         // Check if guy is falling
-        log.debug("Dying: " + guy.isDying() + " Falling: " + guy.isFalling());
         if(!guy.isDying()) {
             guy.startFall(runTime);
             for (GroundCube gc : groundCubes) {
-                //log.debug("Guy=" + guy.getPosition() + " shape=" + s.getPosition());
-            /*if((guy.getPosition().y - 0.5) - (s.getPosition().y + 2.5) < 0.01f){
-                if(guy.getPosition().x - 0.5 > s.getPosition().x - 2.5 && guy.getPosition().x + 1 < s.getPosition().x + 2.5){
-                    guy.setFalling(false);
-                }
-            }*/
                 if (gc.collides(guy)) {
                     if (gc.collidesTop(guy)) {
                         guy.stopFall();
@@ -341,11 +333,11 @@ public class CubeEngine implements ApplicationListener {
             Gdx.gl11.glLightfv(l.ID, GL11.GL_SPECULAR, l.getLightSpecular(), 0);
             Gdx.gl11.glLightfv(l.ID, GL11.GL_POSITION, l.getLightPosition(), 0);
         }
-        /*float[] lightSpotDirection = {-mainCamera.n.x, -mainCamera.n.y, -mainCamera.n.z, 1.0f};
+        float[] lightSpotDirection = {-mainCamera.n.x, -mainCamera.n.y, -mainCamera.n.z, 1.0f};
         Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_SPOT_DIRECTION, lightSpotDirection, 0);
-        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_EXPONENT, 10.0f);
-        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_CUTOFF, 20.0f);
-        */
+        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_EXPONENT, 5.0f);
+        Gdx.gl11.glLightf(GL11.GL_LIGHT0, GL11.GL_SPOT_CUTOFF, 30.0f);
+
         //
 
         Gdx.gl11.glMaterialfv(GL11.GL_FRONT, GL11.GL_DIFFUSE, skyBox.getDiffuse().getArray(), 0);
@@ -380,11 +372,12 @@ public class CubeEngine implements ApplicationListener {
         fontBatch.begin();
         font.setColor(Color.WHITE);
         if(controlCamera){
-            font.draw(fontBatch, "Camera", 20, height - 20);
+            font.draw(fontBatch, "C: Camera", 10, height - 30);
         } else {
-            font.draw(fontBatch, "Guy", 20, height - 20);
+            font.draw(fontBatch, "C: Guy", 10, height - 30);
         }
-        font.draw(fontBatch, "FPS: " + fps, 20, height - 40);
+        font.draw(fontBatch, "F1-F4: Camera angle ", 10, height - 10);
+        font.draw(fontBatch, "FPS: " + fps, width - 60, height - 10);
         fontBatch.end();
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
     }
@@ -417,7 +410,7 @@ public class CubeEngine implements ApplicationListener {
         if(mainCamera != null) {
             mainCamera.perspective(90.0f, ratio, 1.0f, 100.0f);
         }
-    }
+    }   
 
     @Override
     public void pause() {
