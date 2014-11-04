@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.BufferUtils;
 import is.ru.tgra.cube.helpers.ColorRGB;
+import is.ru.tgra.cube.helpers.CubeLogger;
 import is.ru.tgra.cube.helpers.Point3D;
+import is.ru.tgra.cube.helpers.Vector3D;
 
 import java.nio.FloatBuffer;
 
@@ -24,9 +26,21 @@ public class GroundCube{
     private static Texture texture;
     private static String textureFile = "assets/textures/obsidian.png";
     private Point3D position;
+    private boolean moving;
+    private Point3D startPosition;
+    private Point3D endPosition;
+    private Vector3D movement;
 
     public GroundCube(Point3D position){
         setPosition(position);
+    }
+
+    public GroundCube(Point3D startPosition, Point3D endPosition, Vector3D movement){
+        this.moving = true;
+        this.position = new Point3D(startPosition);
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.movement = movement;
     }
 
     public Point3D getPosition() {
@@ -35,6 +49,10 @@ public class GroundCube{
 
     public void setPosition(Point3D position) {
         this.position = position;
+    }
+
+    public Vector3D getMovement(){
+        return this.movement;
     }
 
     public static float getSize() {
@@ -94,6 +112,10 @@ public class GroundCube{
         GroundCube.texture = texture;
     }
 
+    public boolean isMoving() {
+        return moving;
+    }
+
     public static void loadVertices()
     {
         vertexBuffer = BufferUtils.newFloatBuffer(72);
@@ -129,6 +151,13 @@ public class GroundCube{
 
     public static void setTextureFile(String textureFile) {
         GroundCube.textureFile = textureFile;
+    }
+
+    public void updateMovement(float deltaTime){
+        if(position.lessThan(startPosition) || position.greaterThan(endPosition)){
+            movement.reverse();
+        }
+        position.add(Vector3D.scale(movement, deltaTime));
     }
 
     public void draw()

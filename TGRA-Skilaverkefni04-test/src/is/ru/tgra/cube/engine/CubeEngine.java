@@ -27,12 +27,14 @@ public class CubeEngine implements ApplicationListener {
     Camera mainCamera;
     List<Light> lights;
     Light light1;
+    Light sphereLight;
     List<Shape> shapes;
     List<GroundCube> groundCubes;
     List<Shape> enemies;
     SkyBox skyBox;
     CubeLogger log = CubeLogger.getInstance();
     Guy guy;
+    Sphere sphere;
     boolean controlCamera = false;
     int fps;
     Point3D checkPoint;
@@ -59,20 +61,6 @@ public class CubeEngine implements ApplicationListener {
         this.font = new BitmapFont();
         font.setColor(Color.WHITE);
 
-        // Lights
-        lights = new ArrayList<Light>();
-
-        light1 = new Light(GL11.GL_LIGHT0);
-        light1.setLightPosition(new Point3D(0.0f, 3.0f, 11.0f));
-        light1.setLightDiffuse(new ColorRGB(1.0f, 1.0f, 1.0f));
-        light1.setLightSpecular(new ColorRGB(1.0f, 1.0f, 1.0f));
-        lights.add(light1);
-
-        for(int i = 0; i < lights.size() && i < glLight.length; i++){
-            Gdx.gl11.glEnable(glLight[i]);
-            log.debug("Enabling light: " + i);
-        }
-
         // Cameras
         mainCamera = new Camera();
         cameraOffset = new Vector3D(0, 3.0f, 10.0f);
@@ -90,10 +78,10 @@ public class CubeEngine implements ApplicationListener {
         // -Guy
         Guy.loadVertices();
         checkPoint = new Point3D(0.0f, 0.5f, 0.0f);
-        guy = new Guy(new Point3D(checkPoint), 0.5f, new ColorRGB(0, 1, 0));
-        guy.setDiffuse(new ColorRGB(0, 1, 0));
-        guy.setSpecular(new ColorRGB(0, 1, 0));
-        guy.setEmission(new ColorRGB(0, 0.4f, 0));
+        guy = new Guy(new Point3D(checkPoint), 0.7f, new ColorRGB(0, 1, 0));
+        guy.setDiffuse(new ColorRGB(1.0f, 1.0f, 1.0f));
+        guy.setSpecular(new ColorRGB(0, 0, 0));
+        guy.setEmission(new ColorRGB(0, 0, 0));
         guy.setShininess(50);
         guy.setSpeed(5.0f);
 
@@ -107,7 +95,7 @@ public class CubeEngine implements ApplicationListener {
         GroundCube.setShininess(0);
 
         groundCubes.add(new GroundCube(new Point3D(0.0f, -2.5f, 0.0f)));
-        groundCubes.add(new GroundCube(new Point3D(4.0f, -2.5f, 0.0f)));
+        groundCubes.add(new GroundCube(new Point3D(3.0f, -2.5f, 0.0f), new Point3D(7.0f, -2.5f, 0.0f), new Vector3D(3.0f, 0.0f, 0.0f)));
         groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, 0.0f)));
         groundCubes.add(new GroundCube(new Point3D(10.0f, -1.0f, -5.0f)));
         groundCubes.add(new GroundCube(new Point3D(15.0f, 0, -5.0f)));
@@ -115,8 +103,9 @@ public class CubeEngine implements ApplicationListener {
         // Enemies
         this.enemies = new ArrayList<Shape>();
         // -Sphere
-        Sphere sphere = new Sphere(64, 128);
-        sphere.setPosition(new Point3D(4.0f, 0.5f, 0.0f));
+        sphere = new Sphere(64, 128);
+        sphere.setPosition(new Point3D(6.0f, 0.5f, 0.0f));
+        sphere.setMovement(new Point3D(5.0f, 2.0f, -2.0f), new Point3D(2.0f, -2.0f, -2.0f), new Point3D(8.0f, -2.0f, 2.0f), new Point3D(9.0f, 2.0f, 2.0f));
         sphere.setDiffuse(new ColorRGB(1f, 1f, 1f));
         sphere.setSpecular(new ColorRGB(1f, 0f, 0f));
         sphere.setEmission(new ColorRGB(0.5f, 0f, 0f));
@@ -124,6 +113,37 @@ public class CubeEngine implements ApplicationListener {
         sphere.setSize(0.4f);
         shapes.add(sphere);
         enemies.add(sphere);
+
+        Sphere sphere1 = new Sphere(64, 128);
+        sphere1.setPosition(new Point3D(4.0f, 0.2f, 0.0f));
+        sphere1.setDiffuse(new ColorRGB(0.2f, 0.2f, 0.5f));
+        sphere1.setSpecular(new ColorRGB());
+        sphere1.setEmission(new ColorRGB());
+        sphere1.setShininess(0);
+        sphere1.setSize(0.5f);
+        shapes.add(sphere1);
+        enemies.add(sphere1);
+
+
+        // Lights
+        lights = new ArrayList<Light>();
+
+        light1 = new Light(GL11.GL_LIGHT0);
+        light1.setLightPosition(new Point3D(0.0f, 3.0f, 11.0f));
+        light1.setLightDiffuse(new ColorRGB(0.5f, 0.5f, 0.5f));
+        light1.setLightSpecular(new ColorRGB(0.3f, 0.3f, 0.3f));
+        lights.add(light1);
+
+        sphereLight = new Light(GL11.GL_LIGHT1);
+        sphereLight.setLightPosition(sphere.getPosition());
+        sphereLight.setLightDiffuse(new ColorRGB(1.0f, 0, 0));
+        sphereLight.setLightSpecular(new ColorRGB(1.0f, 0, 0));
+        lights.add(sphereLight);
+
+        for(int i = 0; i < lights.size() && i < glLight.length; i++){
+            Gdx.gl11.glEnable(glLight[i]);
+            log.debug("Enabling light: " + i);
+        }
 
         // InputProcessor
         setInputProcessor();
@@ -201,25 +221,31 @@ public class CubeEngine implements ApplicationListener {
                 log.debug("mainCamera eye: " + mainCamera.eye);
             }
         } else {
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                guy.moveLeft(deltaTime);
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                guy.moveRight(deltaTime);
+            if(!guy.isDying()) {
+                if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                    guy.moveLeft(deltaTime);
                 }
-            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                if( !(guy.isJumping() || guy.isFalling()) ){
-                    guy.setJumping(true);
-                    guy.startJump(runTime);
+                if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                    guy.moveRight(deltaTime);
                 }
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                    if (!(guy.isJumping() || guy.isFalling())) {
+                        guy.setJumping(true);
+                        guy.startJump(runTime);
+                    }
+                }
+                if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                }
             }
         }
 
-        for(Shape s : enemies){
-            if(s.collides(guy)){
-                reset();
+        if(!guy.isDying()) {
+            for (Shape s : enemies) {
+                if (s.collides(guy)) {
+                    guy.setFalling(false);
+                    guy.startDying(runTime);
+
+                }
             }
         }
 
@@ -232,7 +258,8 @@ public class CubeEngine implements ApplicationListener {
         }
 
         // Check if guy is falling
-        if(!guy.isFalling() || !guy.isDying()) {
+        log.debug("Dying: " + guy.isDying() + " Falling: " + guy.isFalling());
+        if(!guy.isDying()) {
             guy.startFall(runTime);
             for (GroundCube gc : groundCubes) {
                 //log.debug("Guy=" + guy.getPosition() + " shape=" + s.getPosition());
@@ -245,10 +272,27 @@ public class CubeEngine implements ApplicationListener {
                     if (gc.collidesTop(guy)) {
                         guy.stopFall();
                         guy.setPosition(new Point3D(guy.getPosition().x, gc.getPosition().y + GroundCube.getRadius() + guy.getRadius(), guy.getPosition().z));
+                        if(gc.isMoving()){
+                            guy.getPosition().add(Vector3D.scale(gc.getMovement(), deltaTime));
+                        }
                     } else {
                         guy.moveBack();
                     }
                 }
+            }
+        }
+
+        // Move sphere
+        if(sphere.isMoving()){
+            sphere.updateMovement(runTime);
+        } else {
+            sphere.startMovement(runTime, 1.0f);
+        }
+
+        // Update moving groundCubes
+        for(GroundCube gc : groundCubes){
+            if(gc.isMoving()){
+                gc.updateMovement(deltaTime);
             }
         }
 

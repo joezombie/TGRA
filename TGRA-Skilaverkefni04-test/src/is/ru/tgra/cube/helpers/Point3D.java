@@ -42,6 +42,28 @@ public class Point3D
         return new float[]{x, y, z};
     }
 
+    public boolean lessThan(Point3D other){
+        boolean result = false;
+        if(this.x > other.x || this.y > other.y || this.z > other.z){
+            result = false;
+        }else if (this.x < other.x || this.y < other.y || this.z < other.z){
+            result = true;
+        }
+
+        return result;
+    }
+
+    public boolean greaterThan(Point3D other){
+        boolean result = false;
+        if(this.x < other.x || this.y < other.y || this.z < other.z){
+            result = false;
+        }else if (this.x > other.x || this.y > other.y || this.z > other.z){
+            result = true;
+        }
+
+        return result;
+    }
+
     @Override
     public String toString() {
         return "Point3D{" +

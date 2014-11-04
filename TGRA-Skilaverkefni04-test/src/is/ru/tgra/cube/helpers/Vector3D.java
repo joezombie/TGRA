@@ -19,6 +19,12 @@ public class Vector3D
 		y = yy;
 		z = zz;
 	}
+
+    public void reverse(){
+        x = -x;
+        y = -y;
+        z = -z;
+    }
 	
 	public float length()
 	{

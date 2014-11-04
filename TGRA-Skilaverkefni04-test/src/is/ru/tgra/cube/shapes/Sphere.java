@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.utils.BufferUtils;
+import is.ru.tgra.cube.helpers.Point3D;
 import is.ru.tgra.cube.shapes.Shape;
 import is.ru.tgra.cube.shapes.ShapeAbstract;
 
@@ -16,6 +17,14 @@ public class Sphere extends ShapeAbstract
 	private FloatBuffer normalBuffer;
 	private int vertexCount;
 	private boolean drawLines = false;
+    private boolean moving;
+    private Point3D P1;
+    private Point3D P2;
+    private Point3D P3;
+    private Point3D P4;
+    private float startTime;
+    private float endTime;
+    private float duration;
 	
 	
 	public Sphere(int i_stacks, int i_slices) {
@@ -49,7 +58,49 @@ public class Sphere extends ShapeAbstract
 		normalBuffer.rewind();
 	}
 
-	public void draw() {
+    public boolean isMoving() {
+        return moving;
+    }
+
+    public void setMovement(Point3D P1, Point3D P2, Point3D P3, Point3D P4){
+        this.P1 = P1;
+        this.P2 = P2;
+        this.P3 = P3;
+        this.P4 = P4;
+    }
+
+    public void startMovement(float runTime, float duration){
+        this.startTime = runTime;
+        this.endTime = runTime + duration;
+        this.duration = duration;
+        this.moving = true;
+    }
+
+    public void updateMovement(float runTime){
+        if(runTime < endTime) {
+            float t = (runTime - startTime) / (endTime - startTime);
+
+            position.x = (1.0f - t) * (1.0f - t) * (1.0f - t) * P1.x
+                    + 3 * (1.0f - t) * (1.0f - t) * t * P2.x
+                    + 3 * (1.0f - t) * t * t * P3.x
+                    + t * t * t * P4.x;
+
+            position.y = (1.0f - t) * (1.0f - t) * (1.0f - t) * P1.y
+                    + 3 * (1.0f - t) * (1.0f - t) * t * P2.y
+                    + 3 * (1.0f - t) * t * t * P3.y
+                    + t * t * t * P4.y;
+
+            position.z = (1.0f - t) * (1.0f - t) * (1.0f - t) * P1.z
+                    + 3 * (1.0f - t) * (1.0f - t) * t * P2.z
+                    + 3 * (1.0f - t) * t * t * P3.z
+                    + t * t * t * P4.z;
+        } else {
+            setMovement(P4, P3, P2, P1);
+            startMovement(runTime, duration);
+        }
+    }
+
+    public void draw() {
         Gdx.gl11.glTranslatef(position.x, position.y, position.z);
         Gdx.gl11.glScalef(size, size, size);
 		Gdx.gl11.glShadeModel(GL11.GL_SMOOTH);
@@ -71,6 +122,25 @@ public class Sphere extends ShapeAbstract
 
     @Override
     public boolean collides(Shape shape) {
-        return false;
+        boolean result = false;
+        float deltaXCubed = position.x - shape.getPosition().x;
+        deltaXCubed *= deltaXCubed;
+        deltaXCubed *= deltaXCubed;
+        float deltaYCubed = position.y - shape.getPosition().y;
+        deltaYCubed *= deltaYCubed;
+        deltaYCubed *= deltaYCubed;
+        float deltaZCubed = position.z - shape.getPosition().z;
+        deltaZCubed *= deltaZCubed;
+        deltaZCubed *= deltaZCubed;
+
+        float radiusSumCubed = radius + shape.getRadius();
+        radiusSumCubed *= radiusSumCubed;
+        radiusSumCubed *= radiusSumCubed;
+
+        if(deltaXCubed + deltaYCubed + deltaZCubed <= radiusSumCubed){
+            result = true;
+        }
+
+        return result;
     }
 }

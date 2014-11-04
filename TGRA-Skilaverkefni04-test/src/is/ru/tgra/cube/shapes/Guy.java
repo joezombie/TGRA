@@ -20,7 +20,7 @@ public class Guy extends ShapeAbstract {
     private Texture texture;
     private String textureFile = "assets/textures/guy.png";
     private Vector3D jump;
-    private boolean dying;
+    private boolean dying = false;
     private boolean dyingDone;
     private float dieStartTime;
     private float dieEndTime;
